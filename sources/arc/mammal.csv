@@ -1,0 +1,28 @@
+CACA,American Beaver,Castor canadensis,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+COTO,Townsend's Big-eared Bat,Corynorhinus townsendii,Mammal,Provincial,Blue,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+EPFU,Big Brown Bat,Eptesicus fucus,Mammal,Provincial,Yellow,0,0,2,0,0,0,4,2,0,2,0,0,0,0,10,20.00%,,0,0,0,0,0,3,2,4,0,0,1,0
+LACI,Hoary Bat,Lasiurus cinereus,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+LANO,Silver-haired Bat,Lasionycteris noctivagans,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+LOCA,North American River Otter,Lontra canadensis,Mammal,Provincial,Yellow,0,0,0,0,1,0,2,0,0,2,0,0,0,0,5,40.00%,,0,0,0,0,1,2,1,0,0,0,1,0
+MAFL,Yellow-bellied Marmot,Marmota flaviventris,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,100.00%,,0,0,0,1,1,0,0,0,0,0,0,0
+MITO,Townsend's Vole,Microtus townsendii,Mammal,Provincial,Yellow,0,0,1,0,0,0,0,0,0,3,0,0,0,0,4,75.00%,,0,0,0,0,0,0,0,4,0,0,0,0
+MUMU,House Mouse,Mus musculus,Mammal,Provincial,Exotic,0,1,1,3,1,0,10,0,0,8,0,0,0,0,24,33.33%,,7,0,0,1,0,4,5,0,3,2,2,0
+MYCA,California Myotis,Myotis californicus,Mammal,Provincial,Yellow,0,0,0,2,3,0,1,0,0,1,0,0,0,0,7,14.29%,,0,0,0,1,0,1,2,1,1,1,0,0
+MYEV,Long-eared Myotis,Myotis evotis,Mammal,Provincial,Yellow,0,0,1,0,0,0,0,0,0,1,0,0,0,0,2,50.00%,,0,0,0,0,0,0,1,1,0,0,0,0
+MYLU,Little Brown Myotis,Myotis lucifugus,Mammal,Provincial,Yellow,0,0,0,0,1,0,4,0,0,1,0,0,0,0,6,16.67%,,0,0,0,0,0,1,2,2,0,0,1,0
+MYYU,Yuma Myotis,Myotis yumanensis,Mammal,Provincial,Yellow,0,0,0,1,2,0,1,0,0,2,0,0,0,0,6,33.33%,,0,1,0,1,1,0,0,1,1,0,0,1
+NECI,Bushy-tailed Woodrat,Neotoma cinerea,Mammal,,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+NEVI,American Mink,Neovision vison,Mammal,Provincial,Yellow,0,0,0,1,0,0,1,0,0,0,0,0,0,0,2,0.00%,,0,0,0,0,0,2,0,0,0,0,0,0
+ODHE,Columbian Black-tailed Deer,Odocoileus hemionus,Mammal,Provincial,Yellow,0,0,2,1,5,5,19,5,0,13,4,0,0,0,54,31.48%,,0,0,0,0,17,16,10,5,4,2,0,0
+ONZI,Common Muskrat,Ondatra zibethicus,Mammal,Provincial,Yellow,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0.00%,,0,0,0,0,0,0,0,0,0,1,0,0
+PEMA,North American Deermouse,Peromyscus maniculatus,Mammal,Provincial,Yellow,0,5,0,6,2,1,3,0,0,13,0,0,0,0,30,43.33%,,0,0,1,0,0,10,6,3,8,1,1,0
+PHVI,Harbour Seal,Phoca vitulina,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,5,0,5,100.00%,,0,0,0,0,0,1,4,0,0,0,0,0
+PRLO,Raccoon,Procyon lotor,Mammal,Provincial,Yellow,0,7,1,4,0,9,33,3,0,85,5,0,0,0,147,61.22%,,7,2,3,7,16,66,23,7,3,4,9,0
+RANO,Norway Rat,Rattus norvegicus,Mammal,Provincial,Exotic,0,0,0,3,0,0,12,0,0,0,0,0,0,0,15,0.00%,,0,0,0,1,0,8,4,1,1,0,0,0
+RARA,Black Rat,Rattus rattus,Mammal,Provincial,Exotic,0,0,0,2,1,0,15,0,0,0,0,0,0,0,18,0.00%,,0,0,0,0,2,3,10,0,3,0,0,0
+SCCA,Eastern Grey Squirrel,Sciurus carolinensis,Mammal,Provincial,Exotic,0,38,2,14,10,17,62,20,0,88,1,0,0,0,252,35.32%,,0,0,6,54,20,18,28,61,56,4,2,3
+SORE,Shrew sp.,Sorex spp.,Mammal,Provincial,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+SOVA,Vagrant Shrew,Sorex vagrans,Mammal,Provincial,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+SYFL,Eastern Cottontail,Sylvilagus floridanus,Mammal,Provincial,Exotic,0,69,19,18,43,17,123,16,0,66,2,0,0,0,373,18.23%,,1,3,9,68,73,96,52,39,21,8,2,1
+TADO,Douglas Squirrel,Tamiasciurus douglasii,Mammal,Provincial,Yellow,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+TAHU,Red Squirrel,Tamiasciurus hudsonicus,Mammal,Provincial,Yellow,0,0,0,0,0,0,1,1,0,3,0,0,0,0,5,60.00%,,0,0,0,0,0,0,0,3,2,0,0,0

@@ -1,0 +1,13 @@
+BADO,Barbary Dove,Streptopelia risoria,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+CANA,Canary,Serinus canaria domestica,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+DODU,Domestic Duck,,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+DOPI,Domestic Pigeon,Columba livia domestica,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+FAPI,Fancy Pigeon,,Domestic,Neither,,1,0,0,0,0,1,0,0,0,0,0,0,4,0,6,66.67%,,0,1,0,0,0,1,2,0,2,0,0,0
+INPE,Indian Peafowl,Pavo cristatus,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+JAQU,Japanese Quail,Coturnix japonica,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,100.00%,,0,0,0,0,0,1,0,0,0,0,0,0
+KIPI,King Pigeon,,Domestic,Neither,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+MUDO,Domestic Mouse,Mus Musculus domestica,Domestic,Neither,,0,4,0,0,0,0,0,0,0,0,0,0,0,0,4,0.00%,,0,0,4,0,0,0,0,0,0,0,0,0
+ORCU,European Rabbit,Oryctolagus cuniculus,Domestic,Provincial,Exotic,1,6,0,2,0,0,9,1,0,0,0,0,4,0,23,17.39%,,0,0,0,1,7,1,4,3,3,2,1,1
+POMU,European Wall Lizard,Podarcis muralis,Domestic,Neither,Exotic,0,0,0,1,1,0,0,0,0,1,0,0,0,0,3,33.33%,,0,0,0,0,1,1,1,0,0,0,0,0
+TSEL,Red-eared Slider,Trachemys scripta elegans,Domestic,Neither,Exotic,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0
+WITU,Wild Turkey,Meleagris gallopavo,Domestic,Neither,Exotic,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,#DIV/0!,,0,0,0,0,0,0,0,0,0,0,0,0

@@ -18,8 +18,10 @@
   "homepage": "https://github.com/Ethazeriel/arc-med#readme",
   "dependencies": {
     "chalk": "^4.1.2",
+    "csv-parse": "^5.0.3",
     "eslint": "^8.5.0",
     "html-table-to-json": "^1.0.0",
-    "mongodb": "^4.2.2"
+    "mongodb": "^4.2.2",
+    "prompt-sync": "^4.2.0"
   }
 }
