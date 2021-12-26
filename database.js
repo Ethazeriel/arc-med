@@ -5,7 +5,6 @@ const { mongo } = require('./config.json');
 // Connection URL
 const url = mongo.url;
 const dbname = mongo.database;
-const collname = mongo.collection;
 let db;
 let con;
 MongoClient.connect(url, function(err, client) {
@@ -26,42 +25,33 @@ async function closeDB() {
   }
 }
 
-async function getTrack(query) {
-  // returns the first track object that matches the query
+async function get(query, collection) { // arc v1
+  // returns the first item that matches the query
   try {
-    const tracks = db.collection(collname);
+    const tracks = db.collection(collection);
     const track = await tracks.findOne(query);
     return track;
   } catch (error) {
     logLine('error', ['database error:', error.stack]);
   }
 }
-/*
-Usage examples:
-get track by youtubeID: await getTrack({'youtube.id': 'mdh6upXZL6c'});
-spotifyID: await getTrack({ 'spotify.id': '76nqR8hb279mkQLNkQMzK1' });
-key: await getTrack({ keys:'tng%20those%20arent%20muskets' });
-generally speaking we should let the client close after the query - but if there are issues with repeated queries, could try setting keepAlive to true;
-*/
+// get track by youtubeID: await getTrack({'youtube.id': 'mdh6upXZL6c'});
 
-async function insertTrack(track, query) {
-  // inserts a single track object into the database
-  if (query == null) {query = 'youtube';} // by default, check for duplicate youtube urls - if we want to lookout for eg. spotifyURIs instead, can specify
-  const id = 'id';
-  const search = query + '.id';
+
+async function insert(thing, query, collection) { // arc v1
+  // inserts a single thing into the database
+  if (query == null) {query = 'id';} // what do we compare against to avoid dulicates
   try {
-    const tracks = db.collection(collname);
+    const tracks = db.collection(collection);
     // check if we already have this url
-    if (!track.ephemeral) {
-      const test = await tracks.findOne({ [search]: track[query][id] });
-      if (test == null || test[query][id] != track[query][id]) {
+    const test = await tracks.findOne({ [query]: thing[query] });
+    if (test == null || test[query] != thing[query]) {
       // we don't have this in our database yet, so
-        const result = await tracks.insertOne(track);
-        logLine('database', [`Adding track ${chalk.green(track.spotify.name || track.youtube.name)} by ${chalk.green(track.artist.name)} to database`]);
-        return result;
-      } else { throw new Error(`Track ${track.youtube.id} already exists!`);}
+      const result = await tracks.insertOne(thing);
+      logLine('database', [`Adding: ${chalk.green(thing[query])} to database ${chalk.blue(collection)}`]);
+      return result;
+    } else { throw new Error(`Code ${track.speciescode} already exists!`);}
     // console.log(track);
-    } else { throw new Error('This track is ephemeral!');}
   } catch (error) {
     logLine('error', ['database error:', error.message]);
   }
@@ -231,8 +221,8 @@ async function listPlaylists() {
 }
 
 
-exports.getTrack = getTrack;
-exports.insertTrack = insertTrack;
+exports.get = get;
+exports.insert = insert;
 exports.addKey = addKey;
 exports.addPlaylist = addPlaylist;
 exports.getPlaylist = getPlaylist;

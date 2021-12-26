@@ -1,0 +1,17 @@
+species db format - 
+{
+  "id":"4 letter string",
+  "name":"string - english name",
+  "sciname":"string - latin name",
+  "bandsize":"string",
+  "category": {
+    "basic":"string - bird/amph/mam/rept",
+    "detail":"string - heron/woodpecker/etc"
+  },
+  "designation":"string - prov/fed/both",
+  "bclist":"string- blue/red/yellow"
+}
+
+{
+
+}
