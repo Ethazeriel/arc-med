@@ -1,0 +1,25 @@
+{
+  "name": "arc-med",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ethazeriel/arc-med.git"
+  },
+  "author": "eth",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ethazeriel/arc-med/issues"
+  },
+  "homepage": "https://github.com/Ethazeriel/arc-med#readme",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "eslint": "^8.5.0",
+    "html-table-to-json": "^1.0.0",
+    "mongodb": "^4.2.2"
+  }
+}
