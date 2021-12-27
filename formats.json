@@ -11,7 +11,36 @@ species db format -
   "designation":"string - prov/fed/both",
   "bclist":"string- blue/red/yellow"
 }
-
+drug db format
 {
-
+  "arcname":"string",
+  "genericname":"string",
+  "brands":["strings"],
+  "type":"string - antibiotic, painkiller, etc",
+  "options":[{
+    "type":"capsule, tablet, liquid",
+    "dose":"int - mg/ml"
+  }]
+}
+patient db format
+{
+  "year":21,
+  "id":2874,
+  "species":"AMRO",
+  "weight":[{
+    "timestamp":"isodate", // I'm not sure if I want to use proper date objects here or just write some regex and store as a custom string
+    "grams":"int",
+    "kilos":"int"
+  }],
+  "drugs":[{ // the thinking here is to do an object every time it's prescribed, but not for each dose - so if you do two 5-day courses of a drug, that's two objects
+    "genericname":"string",
+    "type":"string - capsule/tablet/liquid",
+    "dose":"int -mg/ml",
+    "amount":"int - round to 2 decimal places",
+    "startdate":"isodate",
+    "schedule":"string - BID, SID",
+    "doses":"int - 10", // user can enter number of doses, number of days at that schedule, etc
+    "when":["date"],// array of all the dates we want - day and AM/MID/PM?
+    "prescribedby":"string - use initials"
+  }]
 }
