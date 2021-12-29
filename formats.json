@@ -19,8 +19,18 @@ drug db format
   "type":"string - antibiotic, painkiller, etc",
   "options":[{
     "type":"capsule, tablet, liquid",
-    "dose":"int - mg/ml"
-  }]
+    "amount":"int - mg/ml"
+  }],
+  "dose":{
+    "general":{
+      "low":"int",
+      "high":"int",
+    }, // probably specify range something like this?
+    "rabbit":{
+      "low":"int",
+      "high":"int",
+    } // specify unique for each species with different dosing, forin through
+  }
 }
 patient db format
 {
