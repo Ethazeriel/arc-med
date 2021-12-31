@@ -19,4 +19,17 @@ function App() {
   );
 }
 
+function Critter(critter) {
+  return (
+    <div className="Critter">
+      <header className="App-header">
+        <p>Code: {critter.id}</p><br />
+        <p>Name: {critter.name}</p><br />
+        <p>Scientific name: {critter.sciname}</p><br />
+        <p>Type: {critter.category.detail}</p><br />
+      </header>
+    </div>
+  );
+}
 export default App;
+export {Critter};
