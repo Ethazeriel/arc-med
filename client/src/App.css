@@ -24,6 +24,11 @@
   color: white;
 }
 
+.Critter-details {
+font-size: calc(10px + 1vmin);
+text-align: left;
+}
+
 .App-link {
   color: #61dafb;
 }

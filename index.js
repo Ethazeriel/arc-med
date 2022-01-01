@@ -8,17 +8,16 @@ const port = 3001;
 
 app.use(helmet());
 app.use(express.static(path.resolve(__dirname, './client/build')));
-app.use(express.urlencoded({ extended:true }));
+app.use(express.json());
 
-//app.get('/', (req, res) => {
-//  res.send('hello world');
-//});
 
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+  console.log('get');
+  res.sendFile(path.resolve(__dirname, './client/build', 'index.html'));
 });
 
 app.post('/species', async (req, res) => {
+  console.log('post: ' + req.body.code);
   const id = req.body.code;
   const result = await db.get({ id:id }, 'species');
   res.json(result);
