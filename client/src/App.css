@@ -27,7 +27,7 @@
 }
 
 .Critter-search {
-  min-height: 100%;
+  /* min-height: 100%; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,4 +76,28 @@ text-align: left;
   font-family: 'Fira Code', monospace;
   text-align: right;
   padding-right: 1em;
+}
+
+.Intake-form {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Intake-year {
+  width: 1.3em;
+}
+.Intake-id {
+  width:3em;
+}
+.Intake-species {
+  width:3em;
+}
+
+.Intake-weight {
+  width:3em;
 }

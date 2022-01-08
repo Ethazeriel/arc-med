@@ -42,7 +42,11 @@ patient db format
     "grams":"int",
     "kilos":"int"
   }],
-  "location":"string",
+  "location":{
+    "area":"string",
+    "room":"string",
+    "cage":"string"
+  },
   "drugs":[{ // the thinking here is to do an object every time it's prescribed, but not for each dose - so if you do two 5-day courses of a drug, that's two objects
     "genericname":"string",
     "type":"string - capsule/tablet/liquid",
