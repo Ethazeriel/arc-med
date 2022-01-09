@@ -50,7 +50,7 @@ async function insert(thing, query, collection) { // arc v1
       const result = await tracks.insertOne(thing);
       logLine('database', [`Adding: ${chalk.green(thing[query])} to database ${chalk.blue(collection)}`]);
       return result;
-    } else { throw new Error(`Code ${thing?.id} already exists! (${collection})`);}
+    } else { throw new Error(`Code ${thing[query]} already exists! (${collection})`);}
     // console.log(track);
   } catch (error) {
     logLine('error', ['database error:', error.message]);

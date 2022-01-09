@@ -101,3 +101,12 @@ text-align: left;
 .Intake-weight {
   width:3em;
 }
+
+.Intake-localttext {
+  font-size: calc(10px + 0.5vmin);
+  font-style: italic;
+}
+
+.Intake-localt {
+  width:3em;
+}

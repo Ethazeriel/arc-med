@@ -137,6 +137,9 @@ class IntakeForm extends React.Component {
       locarea: '',
       locroom:'',
       loccage:'',
+      locroomalt:'',
+      loccagealt:'',
+      meds: 0,
     };
     this.state = this.initialState;
     this.handleChange = this.handleChange.bind(this);
@@ -160,6 +163,16 @@ class IntakeForm extends React.Component {
       if (regex.weight.test(value)) {this.setState({ [name]: value });}
       break;
 
+    case 'locarea':
+      this.setState({ locarea: value });
+      this.setState({ locroom: '' });
+      this.setState({ loccage: '' });
+      break;
+
+    case 'locroom':
+      this.setState({ locroom: value });
+      this.setState({ loccage: '' });
+      break;
     default:
       this.setState({ [name]: value });
       break;
@@ -200,14 +213,21 @@ class IntakeForm extends React.Component {
           <div>
             <label>Location: </label>
             <select name="locarea" value={this.state.locarea} onChange={this.handleChange}>
+              <option value="">Area:</option>
               <Locoptions stage="areas" />
             </select>
             <select name="locroom" value={this.state.locroom} onChange={this.handleChange}>
+              <option value="">Room:</option>
               <Locoptions stage="rooms" value={this.state.locarea}/>
             </select>
             <select name="loccage" value={this.state.loccage} onChange={this.handleChange}>
+              <option value="">Cage:</option>
               <Locoptions stage="cages" value={this.state.locroom} />
             </select>
+            <br />
+            <label className="Intake-localttext">Or Manually Input: </label>
+            <input className="Intake-localt" placeholder="Room" name="locroomalt" type="text" value={this.state.locroomalt} onChange={this.handleChange} />
+            <input className="Intake-localt" placeholder="Cage" name="loccagealt" type="text" value={this.state.loccagealt} onChange={this.handleChange} />
           </div>
           <input type="submit" value="Submit" />
 
@@ -218,8 +238,8 @@ class IntakeForm extends React.Component {
 }
 
 function Locoptions(props) {
-  switch (props.stage) {
-  case 'areas':
+
+  if (props.stage == 'areas') {
     return (
       <React.Fragment>
         {arc.areas.map(element => (
@@ -227,34 +247,24 @@ function Locoptions(props) {
         ))}
       </React.Fragment>
     );
+  } else if (props.value && arc[props.stage][props.value]) {
+    return (
+      <React.Fragment>
+        {arc[props.stage][props.value].map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))
 
-
-  default:
-    if (props.value && arc[props.stage][props.value]) {
-      return (
-        <React.Fragment>
-          {arc[props.stage][props.value].map(element => (
-            <option value={element} key={element}>{element}</option>
-          ))
-
-          }
-        </React.Fragment>
-      );
-    } else {return null;}
-  }
+        }
+      </React.Fragment>
+    );
+  } else {return null;}
 }
 
 // eslint-disable-next-line no-unused-vars
 class MedForm extends React.Component {
   constructor(props) {
     super(props);
-    this.initialState = {
-      year: 22,
-      id: '',
-    };
-    this.state = this.initialState;
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {

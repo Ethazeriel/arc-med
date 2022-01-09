@@ -13,6 +13,8 @@
     "Mammals":["Mini Mam", "Mam A", "Mam B", "Mam C"],
     "Avians":["Av A", "Av B", "Av C", "Av D", "Av E", "Av F", "Av K", "Av L", "Av M", "Av N"],
     "Flight":["A", "B", "C", "D"],
-    "Compounds":["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D"]
+    "Compounds":["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D"],
+    "WZ":["Br 1", "Br 2", "Br 3", "Br 4", "Tub"],
+    "IP":["1", "2", "3", "4", "Kennel"]
   }
 }
