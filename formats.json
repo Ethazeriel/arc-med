@@ -19,7 +19,8 @@ drug db format
   "type":"string - antibiotic, painkiller, etc",
   "options":[{
     "type":"capsule, tablet, liquid",
-    "amount":"int - mg/ml"
+    "amount":"int - mg/ml",
+    "route":"PO,SQ"
   }],
   "dose":{
     "general":{
@@ -27,6 +28,7 @@ drug db format
       "high":"int",
     }, // probably specify range something like this?
     "rabbit":{
+      "loading":"int",
       "low":"int",
       "high":"int",
     } // specify unique for each species with different dosing, forin through
