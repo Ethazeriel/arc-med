@@ -128,7 +128,7 @@ class IntakeForm extends React.Component {
     if (day.length == 1) {day = '0' + day;}
     const datestr = `${date.getFullYear()}-${month}-${day}`;
     this.initialState = {
-      year: 22,
+      year: date.getFullYear() % 100,
       id: '',
       species: '',
       weight: '',
@@ -140,10 +140,24 @@ class IntakeForm extends React.Component {
       locroomalt:'',
       loccagealt:'',
       meds: 0,
+      drugs:[],
+    };
+    this.initialMeds = {
+      'arcname':'',
+      'type':'string - capsule/tablet/liquid',
+      'dose':'int -mg/ml',
+      'amount':'int - round to 2 decimal places',
+      'startdate':'isodate',
+      'schedule':'string - BID, SID',
+      'doses':'int - 10',
+      'when':['date'],
+      'prescribedby':'string - use initials',
     };
     this.state = this.initialState;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.medClick = this.medClick.bind(this);
+    this.medChange = this.medChange.bind(this);
   }
 
   handleChange(event) {
@@ -151,6 +165,7 @@ class IntakeForm extends React.Component {
     const value = target.value;
     const name = target.name;
     switch (name) {
+
     case 'species':
       if (regex.species.test(value)) {this.setState({ [name]: value.toUpperCase() });}
       break;
@@ -173,6 +188,7 @@ class IntakeForm extends React.Component {
       this.setState({ locroom: value });
       this.setState({ loccage: '' });
       break;
+
     default:
       this.setState({ [name]: value });
       break;
@@ -187,7 +203,22 @@ class IntakeForm extends React.Component {
     console.log(this.state);
   }
 
+  medClick() {
+    this.state.drugs.push(this.initialMeds);
+    this.setState({ drugs: this.state.drugs });
+    this.setState({ meds: this.state.meds + 1 });
+  }
+
+  medChange(event, index) {
+    console.log('medchange', event, index);
+    console.log(event.target.value);
+    console.log(event.target.name);
+    this.state.drugs[index][event.target.name] = event.target.value;
+    this.setState({ drugs: this.state.drugs });
+  }
+
   render() {
+    const meds = this.state.meds;
     return (
       <div >
         <form className="Intake-form" onSubmit={this.handleSubmit}>
@@ -229,6 +260,7 @@ class IntakeForm extends React.Component {
             <input className="Intake-localt" placeholder="Room" name="locroomalt" type="text" value={this.state.locroomalt} onChange={this.handleChange} />
             <input className="Intake-localt" placeholder="Cage" name="loccagealt" type="text" value={this.state.loccagealt} onChange={this.handleChange} />
           </div>
+          <MedCapsule value={meds} drugs={this.state.drugs} onClick={this.medClick} onChange={this.medChange} />
           <input type="submit" value="Submit" />
 
         </form>
@@ -242,15 +274,15 @@ function Locoptions(props) {
   if (props.stage == 'areas') {
     return (
       <React.Fragment>
-        {arc.areas.map(element => (
+        {arc.locations.areas.map(element => (
           <option value={element} key={element}>{element}</option>
         ))}
       </React.Fragment>
     );
-  } else if (props.value && arc[props.stage][props.value]) {
+  } else if (props.value && arc.locations[props.stage][props.value]) {
     return (
       <React.Fragment>
-        {arc[props.stage][props.value].map(element => (
+        {arc.locations[props.stage][props.value].map(element => (
           <option value={element} key={element}>{element}</option>
         ))
 
@@ -260,7 +292,35 @@ function Locoptions(props) {
   } else {return null;}
 }
 
-// eslint-disable-next-line no-unused-vars
+class MedCapsule extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  onClick() {
+    this.props.onClick();
+  }
+
+  handleChange(event, index) {
+    this.props.onChange(event, index);
+  }
+
+  render() {
+    const meds = [];
+    for (let i = 0; i < this.props.value; i++) {
+      meds.push(<MedForm key={i} id={i} drug={this.props.drugs[i]} onChange={this.handleChange} />);
+    }
+    return (
+      <div>
+        {meds}
+        <button type="button" onClick={this.onClick}>Add Med</button>
+      </div>
+    );
+  }
+}
+
 class MedForm extends React.Component {
   constructor(props) {
     super(props);
@@ -268,17 +328,7 @@ class MedForm extends React.Component {
   }
 
   handleChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
-    switch (name) {
-    case 'species':
-      break;
-
-    default:
-      this.setState({ [name]: value });
-      break;
-    }
+    this.props.onChange(event, this.props.id);
   }
 
   handleSubmit(event) {
@@ -291,20 +341,31 @@ class MedForm extends React.Component {
 
   render() {
     return (
-      <div >
-        <form className="Intake-form" onSubmit={this.handleSubmit}>
-          <div>
-            <label>Case #: </label>
-            <input className="Intake-year" name="year" type="text" value={this.state.year} onChange={this.handleChange} />
-              -
-            <input className="Intake-id" name="id" type="text" value={this.state.case} onChange={this.handleChange} autoComplete="off" />
-          </div>
-          <input type="submit" value="Submit" />
-
-        </form>
+      <div className="Intake-med-box">
+        <p>key: {this.props.id}</p>
+        <div>
+          <label>Select a drug:</label>
+          <select name="arcname" value={this.props.drug.arcname} onChange={this.handleChange}>
+            <option value=""></option>
+            <Drugtypes />
+          </select>
+          <br />
+          <label className="Intake-med-drugttext">Or Manually Input: </label>
+          <input className="Intake-med-drugt" placeholder="Drug" name="arcname" type="text" value={this.props.drug.arcname} onChange={this.handleChange} />
+        </div>
       </div>
     );
   }
+}
+
+function Drugtypes() {
+  return (
+    <React.Fragment>
+      {arc.drugs.map(element => (
+        <option value={element} key={element}>{element}</option>
+      ))}
+    </React.Fragment>
+  );
 }
 
 export default App;

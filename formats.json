@@ -24,13 +24,18 @@ drug db format
   }],
   "dose":{
     "general":{
+      "loading":"int",
       "low":"int",
       "high":"int",
+      "schedule":"string - BID, SID, etc",
+      "doses":"int - 10",
     }, // probably specify range something like this?
     "rabbit":{
       "loading":"int",
       "low":"int",
       "high":"int",
+      "schedule":"string",
+      "doses":"int",
     } // specify unique for each species with different dosing, forin through
   }
 }
@@ -50,7 +55,7 @@ patient db format
     "cage":"string"
   },
   "drugs":[{ // the thinking here is to do an object every time it's prescribed, but not for each dose - so if you do two 5-day courses of a drug, that's two objects
-    "genericname":"string",
+    "arcname":"string",
     "type":"string - capsule/tablet/liquid",
     "dose":"int -mg/ml",
     "amount":"int - round to 2 decimal places",

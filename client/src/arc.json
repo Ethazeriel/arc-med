@@ -1,20 +1,26 @@
 {
-  "areas":["Main Building", "Garage", "Pool Pens", "Outdoors", "PRLO Land", "Deer"],
-  "rooms": {
-    "Main Building":["ER", "ISO 1", "ISO 2", "Mam 1", "Av 1", "Av 2", "CN"],
-    "Garage":["IP", "ICU", "Lab"],
-    "Pool Pens":["PP Ex", "PPISO 1", "PPISO 2", "WZ", "PP 1 Mini", "PP 1 Large", "PP 2", "PP 3"],
-    "Outdoors":["AQ 1", "Aq 2","Mammals", "Screen", "MP", "Avians", "Flight"],
-    "PRLO Land":["Nursery", "PR 1", "PR 2", "PR 3", "PRLO ER", "PRLO ISO L", "PRLO ISO R", "Juvi Pen", "Compounds"],
-    "Deer":["DS 1", "DR 1", "DR 2", "DR 3", "DR 4", "DS 2", "DP 1", "DP 2", "DP 3"]
-  }, 
-  "cages": {
-    "ER":["Inc 1", "Inc 2", "Mini Inc", "O2 Hood"],
-    "Mammals":["Mini Mam", "Mam A", "Mam B", "Mam C"],
-    "Avians":["Av A", "Av B", "Av C", "Av D", "Av E", "Av F", "Av K", "Av L", "Av M", "Av N"],
-    "Flight":["A", "B", "C", "D"],
-    "Compounds":["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D"],
-    "WZ":["Br 1", "Br 2", "Br 3", "Br 4", "Tub"],
-    "IP":["1", "2", "3", "4", "Kennel"]
-  }
+  "locations": {
+    "areas":["Main Building", "Garage", "Pool Pens", "Outdoors", "PRLO Land", "Deer"],
+    "rooms": {
+      "Main Building":["ER", "ISO 1", "ISO 2", "Mam 1", "Av 1", "Av 2", "CN"],
+      "Garage":["IP", "ICU", "Lab"],
+      "Pool Pens":["PP Ex", "PPISO 1", "PPISO 2", "WZ", "PP 1 Mini", "PP 1 Large", "PP 2", "PP 3"],
+      "Outdoors":["AQ 1", "Aq 2","Mammals", "Screen", "MP", "Avians", "Flight"],
+      "PRLO Land":["Nursery", "PR 1", "PR 2", "PR 3", "PRLO ER", "PRLO ISO L", "PRLO ISO R", "Juvi Pen", "Compounds"],
+      "Deer":["DS 1", "DR 1", "DR 2", "DR 3", "DR 4", "DS 2", "DP 1", "DP 2", "DP 3"]
+    }, 
+    "cages": {
+      "ER":["Inc 1", "Inc 2", "Mini Inc", "O2 Hood"],
+      "Mammals":["Mini Mam", "Mam A", "Mam B", "Mam C"],
+      "Avians":["Av A", "Av B", "Av C", "Av D", "Av E", "Av F", "Av K", "Av L", "Av M", "Av N"],
+      "Flight":["A", "B", "C", "D"],
+      "Compounds":["1A", "1B", "1C", "1D", "2A", "2B", "2C", "2D"],
+      "WZ":["Br 1", "Br 2", "Br 3", "Br 4", "Tub"],
+      "IP":["1", "2", "3", "4", "Kennel"]
+    }
+  },
+  "schedules": {
+    
+  },
+  "drugs":["meta", "clav", "gaba", "sulfa", "iver", "torb"]
 }
