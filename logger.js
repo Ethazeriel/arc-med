@@ -1,10 +1,8 @@
+/* eslint-disable no-console */
 const fs = require('fs');
 const chalk = require('chalk');
 const { sanitize } = require('./regexes.js');
-
-if (!fs.existsSync('./logs')) {
-  fs.mkdirSync('./logs');
-}
+const debugMode = require('./config.json').debug;
 
 function currentDT() {
   const date = new Date();
@@ -80,9 +78,9 @@ async function logLine(level, args) {
 async function logCommand(interaction) {
   // takes an interaction, logs relevant details to file and console
   // for console
-  let conStr = `Guild: ${chalk.blue(interaction.member.guild.name.replace(sanitize, '').trim())}, User: ${chalk.blue(`${interaction.user.username.replace(sanitize, '').trim()}#${interaction.user.discriminator}`)}, Command: ${chalk.cyan(interaction.commandName)}`;
+  let conStr = `Guild: ${chalk.blue(interaction.guildId ? interaction.member.guild.name.replace(sanitize, '').trim() : 'DM')}, User: ${chalk.blue(`${interaction.user.username.replace(sanitize, '').trim()}#${interaction.user.discriminator}`)}, Command: ${chalk.cyan(interaction.commandName)}`;
   if (interaction.options._subcommand) {
-    conStr = conStr.concat(`Subcommand: ${chalk.green(interaction.options._subcommand)}, `);
+    conStr = conStr.concat(`, Subcommand: ${chalk.green(interaction.options._subcommand)}`);
   }
   if (interaction.options._hoistedOptions.length) {
     conStr = conStr.concat(', Options: ');
@@ -93,7 +91,7 @@ async function logCommand(interaction) {
     }
   }
   // for file
-  let logStr = `Guild: ${interaction.member.guild.name.replace(sanitize, '').trim()}(${interaction.guildId}), User: ${interaction.user.username.replace(sanitize, '').trim()}#${interaction.user.discriminator}(${interaction.user.id}), Command: ${interaction.commandName}, ID: ${interaction.id}`;
+  let logStr = `Guild: ${interaction.guildId ? interaction.member.guild.name.replace(sanitize, '').trim() : 'DM'}(${interaction.guildId ? interaction.guildId : 'no id'}), User: ${interaction.user.username.replace(sanitize, '').trim()}#${interaction.user.discriminator}(${interaction.user.id}), Command: ${interaction.commandName}, ID: ${interaction.id}`;
   if (interaction.options._subcommand) {
     logStr = logStr.concat(`Subcommand: ${interaction.options._subcommand}, `);
   }
@@ -137,6 +135,22 @@ async function logComponent(interaction) {
   });
 }
 
+async function logDebug(...message) {
+  if (debugMode) {
+    let logStr = '';
+    for (let i = 0; i < message.length; i++) {
+      logStr = logStr.concat(message[i] + ' ');
+    }
+    console.log(`${chalk.yellow(currentDT())} - ${chalk.bold.yellow('DEBUG')} - ${logStr}`);
+  }
+}
+
+async function logSpace() {
+  console.log();
+}
+
 exports.logLine = logLine;
 exports.logCommand = logCommand;
 exports.logComponent = logComponent;
+exports.logDebug = logDebug;
+exports.logSpace = logSpace;
