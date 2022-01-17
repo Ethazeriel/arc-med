@@ -60,19 +60,66 @@ class SpeciesSearch extends React.Component {
   }
 }
 
-function App() {
-  return (
-    <div className="App">
-      <TopBar />
-      <IntakeForm />
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.sectionChoice = this.sectionChoice.bind(this);
+    this.state = {
+      sectionSelect:'IntakeForm',
+    };
+  }
+
+  handleChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    this.setState({ [name]: value });
+  }
+
+
+  sectionChoice(option) {
+    switch (option) {
+    case 'IntakeForm':
+      return (<IntakeForm />);
+
+    case 'SpeciesSearch':
+      return (<SpeciesSearch />);
+
+    default:
+      return null;
+    }
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <TopBar displaychoice={this.state.sectionSelect} onChange={this.handleChange} />
+        {this.sectionChoice(this.state.sectionSelect)}
+      </div>
+    );
+  }
 }
 
 class TopBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.onChange(event);
+  }
+
   render() {
     return (
       <div className="TopBar">
+        <div className="TopBar-item">
+          <select name="sectionSelect" value={this.props.displaychoice} onChange={this.handleChange}>
+            <option value="SpeciesSearch">Species Lookup</option>
+            <option value="IntakeForm">Intake Form</option>
+            <option value="MedBoard">Med Board</option>
+          </select></div>
         <div className="TopBar-item"><h1 className="TopBar-title">ARC-MED</h1></div>
         <div className="TopBar-item"><Clock /></div>
       </div>
@@ -203,18 +250,43 @@ class IntakeForm extends React.Component {
     console.log(this.state);
   }
 
-  medClick() {
-    this.state.drugs.push(this.initialMeds);
-    this.setState({ drugs: this.state.drugs });
+  medClick(event, index) {
+    // console.log(event.target.name, index);
+    this.setState(state => {
+      let drugs = state.drugs;
+      switch (event.target.name) {
+
+      case 'addMed':
+        drugs = state.drugs.concat(this.initialMeds);
+        break;
+
+      case 'delMed':
+        drugs = state.drugs.filter((drug, jndex) => index !== jndex);
+        break;
+
+      default:
+        break;
+      }
+
+      return { drugs };
+    });
     this.setState({ meds: this.state.meds + 1 });
   }
 
   medChange(event, index) {
-    console.log('medchange', event, index);
-    console.log(event.target.value);
-    console.log(event.target.name);
-    this.state.drugs[index][event.target.name] = event.target.value;
-    this.setState({ drugs: this.state.drugs });
+    // console.log(`medchange index ${index}, name ${event.target.name}, value ${event.target.value}`, event);
+    this.setState(state => {
+      const drugs = state.drugs.map((drug, jndex) => {
+        if (jndex === index) {
+          const moddrug = Object.assign({}, drug); // remember this is a shallow copy and will break, will need to special case for nested arrays and objects
+          moddrug[event.target.name] = event.target.value;
+          return moddrug;
+        } else {
+          return drug;
+        }
+      });
+      return { drugs };
+    });
   }
 
   render() {
@@ -299,8 +371,8 @@ class MedCapsule extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  onClick() {
-    this.props.onClick();
+  onClick(event, index) {
+    this.props.onClick(event, index);
   }
 
   handleChange(event, index) {
@@ -308,14 +380,12 @@ class MedCapsule extends React.Component {
   }
 
   render() {
-    const meds = [];
-    for (let i = 0; i < this.props.value; i++) {
-      meds.push(<MedForm key={i} id={i} drug={this.props.drugs[i]} onChange={this.handleChange} />);
-    }
     return (
       <div>
-        {meds}
-        <button type="button" onClick={this.onClick}>Add Med</button>
+        {this.props.drugs.map((drug, i) => (
+          <MedForm key={i} id={i} drug={drug} onClick={this.onClick} onChange={this.handleChange} />
+        ))}
+        <button type="button" name="addMed" onClick={this.onClick}>Add Med</button>
       </div>
     );
   }
@@ -325,10 +395,41 @@ class MedForm extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
 
   handleChange(event) {
     this.props.onChange(event, this.props.id);
+    switch (event.target.name) {
+    case 'arcname':
+      if (arc.drugs.includes(event.target.value)) {
+        fetch('/drugs', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'code':event.target.value,
+          }),
+        }).then((response) => response.json())
+          .then((json) => {
+            // console.log(json);
+            this.setState({ reference:json });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  onClick(event) {
+    this.props.onClick(event, this.props.id);
   }
 
   handleSubmit(event) {
@@ -342,7 +443,8 @@ class MedForm extends React.Component {
   render() {
     return (
       <div className="Intake-med-box">
-        <p>key: {this.props.id}</p>
+        <label>key: {this.props.id}</label>
+        <button type="button" name="delMed" onClick={this.onClick}>Remove</button>
         <div>
           <label>Select a drug:</label>
           <select name="arcname" value={this.props.drug.arcname} onChange={this.handleChange}>
