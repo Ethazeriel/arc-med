@@ -29,7 +29,7 @@ async function get(query, collection) { // arc v1
   // returns the first item that matches the query
   try {
     const tracks = db.collection(collection);
-    const track = await tracks.findOne(query);
+    const track = await tracks.findOne(query, { projection: { _id: 0 } });
     return track;
   } catch (error) {
     logLine('error', ['database error:', error.stack]);
