@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const db = require('../database.js');
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -39,13 +40,7 @@ const entry = {
   'brands':[],
   'type':'',
   'options':[],
-  'dose':{
-    'general':{
-      'loading':1,
-      'low':0.1,
-      'high':3,
-    },
-  },
+  'dose':{},
 };
 
 (async () => {
@@ -72,12 +67,13 @@ const entry = {
     let input2 = '';
     let j = 0;
     while (input2 != 'done') {
-      input2 = prompt('drug type(capsule, tablet, liquid) or \'done\':');
+      input2 = prompt('machine readable drug type(pill, liquid) or \'done\':');
       if (input2 != 'done') {
         const option = {
-          type:input2,
+          typem:input2,
         };
-        option.amount = parseFloat(prompt('dose - int, mg/ml or mg/pill:'));
+        option.typeh = prompt('human readable drug type:');
+        option.amount = parseFloat(prompt('dose - int, mg/ml or mg/pill:')) || null;
         option.route = prompt('route(s) of administration:').toUpperCase();
         console.log(option);
         entry.options[j] = option;
@@ -85,21 +81,16 @@ const entry = {
       }
     }
     console.log(entry.options);
-    entry.dose.general.loading = parseFloat(prompt('general loading dose:'));
-    entry.dose.general.high = parseFloat(prompt('general high dose:'));
-    entry.dose.general.low = parseFloat(prompt('general low dose:'));
-    entry.dose.general.schedule = prompt('general dosing schedule:').toUpperCase();
-    entry.dose.general.doses = parseInt(prompt('general # of doses:'));
     let input3;
     while (input3 != 'done') {
       input3 = prompt('animal group to specify dose info for (or \'done\'):');
       if (input3 != 'done') {
         entry.dose[input3] = {};
-        entry.dose[input3].loading = parseFloat(prompt(`loading dose for ${input3}:`));
-        entry.dose[input3].high = parseFloat(prompt(`high dose for ${input3}:`));
-        entry.dose[input3].low = parseFloat(prompt(`low dose for ${input3}:`));
+        entry.dose[input3].loading = parseFloat(prompt(`loading dose for ${input3}:`)) || null;
+        entry.dose[input3].low = parseFloat(prompt(`low dose for ${input3}:`)) || null;
+        entry.dose[input3].high = parseFloat(prompt(`high dose for ${input3}:`)) || null;
         entry.dose[input3].schedule = prompt(`dosing schedule for ${input3}:`).toUpperCase();
-        entry.dose[input3].doses = parseInt(prompt(`# of doses for ${input3}:`));
+        entry.dose[input3].doses = parseInt(prompt(`# of doses for ${input3}:`)) || null;
       }
     }
     console.log(entry.dose);
@@ -109,10 +100,9 @@ const entry = {
     if (check.startsWith('y')) {
       await db.insert(entry, 'arcname', 'drugs');
     }
-    const check2 = prompt('exit now? y/n:');
-    if (check2.startsWith('y')) {
-      db.closeDB();
-      exit = true;
-    }
+    prompt('Press enter to continue...');
+    db.closeDB();
+    exit = true;
+
   }
 })();

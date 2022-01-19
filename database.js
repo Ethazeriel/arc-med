@@ -98,6 +98,17 @@ async function printCount(collection) {
   }
 }
 
+async function list(query, collection) {
+  // returns all the unique values of a field
+  try {
+    const tracks = db.collection(collection);
+    const uniques = await tracks.distinct(query);
+    return uniques;
+  } catch (error) {
+    logLine('error', ['database error:', error.stack]);
+  }
+}
+
 
 exports.get = get;
 exports.insert = insert;
@@ -105,3 +116,4 @@ exports.printCount = printCount;
 exports.closeDB = closeDB;
 exports.remove = remove;
 exports.update = update;
+exports.list = list;

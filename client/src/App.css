@@ -79,13 +79,24 @@ text-align: left;
 }
 
 .Intake-form {
-  min-height: 100%;
+  /* min-height: 100%; */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.Intake-toprow {
+  display: flex;
+  flex-direction: row;
+}
+
+.Intake-toprow div {
+  border-left: 0px solid grey;
+  border-right: 0px solid grey;
+  padding: 0.25em;
 }
 
 .Intake-year {
@@ -111,15 +122,69 @@ text-align: left;
   width:3em;
 }
 
+.Intake-wrtext {
+  font-size: calc(10px + 1vmin);
+  font-style: italic;
+}
+
 .Intake-med-box {
   background-color: #333741;
+  display: flex;
+  margin-top: 0.5em;
+}
+
+.Intake-med-box div {
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+  padding: 0.25em;
 }
 
 .Intake-med-drugt {
   width:3em;
 }
 
+.Intake-med-delbtn {
+  height:2em;
+  margin-top: 1.5em;
+}
+
 .Intake-med-drugttext {
   font-size: calc(10px + 0.5vmin);
+  font-style: italic;
+}
+
+.Intake-med-drugstext {
+  font-size: calc(10px + 1.5vmin);
+  font-family: 'Fira Code', monospace;
+}
+
+.Intake-med-drugrtext {
+  font-size: calc(3px + 1vmin);
+  font-family: 'Fira Code', monospace;
+}
+
+.Intake-med-dose {
+  width:3em;
+}
+
+.Intake-med-amount {
+  width:3em;
+}
+
+.Intake-med-additions {
+  width:8em;
+}
+
+.Intake-med-percent {
+  width:3em;
+}
+
+.Intake-med-drugutext {
+  font-size: calc(10px + 0.5vmin);
+  font-style: italic;
+}
+
+.Intake-med-fluidutext {
+  font-size: calc(10px + 1vmin);
   font-style: italic;
 }

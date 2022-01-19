@@ -19,8 +19,14 @@
       "IP":["1", "2", "3", "4", "Kennel"]
     }
   },
-  "schedules": {
-    
+  "schedules": ["OD", "SID", "BID", "TID", "QID", "EOD", "E3D"],
+  "drugs":[],
+  "fluids":["Normosol", "Isolyte", "0.9% Saline", "0.45% Saline"],
+  "eyemeds":["BNP", "BNPH", "Cipro", "Tobrex", "Tobradex", "Atropine"],
+  "routes":{
+    "drugs": ["PO", "SQ", "IM", "IV", "Topical"],
+    "fluids": ["PO", "SQ", "IV"],
+    "eyes": ["OS", "OD", "OU"]
   },
-  "drugs":["meta", "clav", "gaba", "sulfa", "iver", "torb"]
+  "rehabbers": ["KB", "RR", "ML", "NM", "MS", "CC", "SB", "SW", "CN", "AH", "WMR", "KH", "JR", "KO", "JA", "CB"]
 }

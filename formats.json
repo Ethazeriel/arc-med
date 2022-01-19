@@ -18,7 +18,8 @@ drug db format
   "brands":["strings"],
   "type":"string - antibiotic, painkiller, etc",
   "options":[{
-    "type":"capsule, tablet, liquid",
+    "typem":"pill, liquid",
+    "typeh":"tablet, capsule, injectable, suspension, etc",
     "amount":"int - mg/ml",
     "route":"PO,SQ"
   }],
@@ -55,10 +56,12 @@ patient db format
     "cage":"string"
   },
   "drugs":[{ // the thinking here is to do an object every time it's prescribed, but not for each dose - so if you do two 5-day courses of a drug, that's two objects
+    "what":"drug, fluid",
     "arcname":"string",
     "type":"string - capsule/tablet/liquid",
     "dose":"int -mg/ml",
     "amount":"int - round to 2 decimal places",
+    "route":"string",
     "startdate":"isodate",
     "schedule":"string - BID, SID",
     "doses":"int - 10", // user can enter number of doses, number of days at that schedule, etc

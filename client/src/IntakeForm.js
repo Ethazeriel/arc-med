@@ -1,0 +1,705 @@
+import './App.css';
+import React from 'react';
+import * as regex from './regexes.js';
+
+class IntakeForm extends React.Component {
+  constructor(props) {
+    super(props);
+    const date = new Date();
+    let month = (date.getMonth() + 1).toString();
+    if (month.length == 1) {month = '0' + month;}
+    let day = date.getDate().toString();
+    if (day.length == 1) {day = '0' + day;}
+    const datestr = `${date.getFullYear()}-${month}-${day}`;
+    this.initialState = {
+      year: date.getFullYear() % 100,
+      id: '',
+      species: '',
+      weight: '',
+      dispweight: '',
+      weightunit: 'grams',
+      weightdate: datestr,
+      locarea: '',
+      locroom:'',
+      loccage:'',
+      locroomalt:'',
+      loccagealt:'',
+      drugs:[],
+      addType:'drug',
+      intakeWR:'',
+    };
+    this.initialMeds = {
+      'what':'drug',
+      'arcname':'',
+      'type':'',
+      'dose':'',
+      'amount':'',
+      'route':'',
+      'startdate':'isodate',
+      'schedule':'string - BID, SID',
+      'doses':'int - 10',
+      'when':['date'],
+      'prescribedby':'',
+    };
+    this.initialFluids = {
+      'what':'fluid',
+      'name':'',
+      'additions':'',
+      'percentBW':2,
+      'amount':'',
+      'route':'',
+      'startdate':'isodate',
+      'schedule':'string - BID, SID',
+      'doses':'int - 10',
+      'when':['date'],
+      'prescribedby':'',
+    };
+    this.initialEyes = {
+      'what':'eyemed',
+      'name':'',
+      'route':'',
+      'startdate':'isodate',
+      'schedule':'string - BID, SID',
+      'doses':'int - 10',
+      'when':['date'],
+      'prescribedby':'',
+    };
+    this.state = this.initialState;
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.medClick = this.medClick.bind(this);
+    this.medChange = this.medChange.bind(this);
+  }
+
+  handleChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    switch (name) {
+
+    case 'species':
+      if (regex.species.test(value)) {this.setState({ [name]: value.toUpperCase() });}
+      break;
+
+    case 'year':
+      if (regex.year.test(value)) {this.setState({ [name]: value });}
+      break;
+
+    case 'dispweight':
+      if (regex.float.test(value)) {this.setState({ [name]: value });}
+      this.setState({ weight: (this.state.weightunit === 'grams') ? parseFloat(value / 1000) : parseFloat(value) });
+      break;
+
+    case 'weightunit':
+      this.setState({ [name]: value });
+      this.setState({ weight: (value === 'grams') ? parseFloat(this.state.dispweight / 1000) : parseFloat(this.state.dispweight) });
+      break;
+
+    case 'locarea':
+      this.setState({ locarea: value });
+      this.setState({ locroom: '' });
+      this.setState({ loccage: '' });
+      break;
+
+    case 'locroom':
+      this.setState({ locroom: value });
+      this.setState({ loccage: '' });
+      break;
+
+    case 'intakeWR':
+      this.setState({ intakeWR: value });
+      this.initialEyes.prescribedby = value;
+      this.initialFluids.prescribedby = value;
+      this.initialMeds.prescribedby = value;
+      break;
+
+    default:
+      this.setState({ [name]: value });
+      break;
+    }
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    // const target = event.target;
+    // const name = target.name;
+    // this.setState({ [name]: this.initialState[name] });
+    console.log(this.state);
+  }
+
+  medClick(event, index) {
+    // console.log(event.target.name, index);
+    this.setState(state => {
+      let drugs = state.drugs;
+      switch (event.target.name) {
+
+      case 'addMed':
+        switch (this.state.addType) {
+        case 'drug':
+          drugs = state.drugs.concat(Object.assign({}, this.initialMeds));
+          break;
+
+        case 'fluid':
+          drugs = state.drugs.concat(Object.assign({}, this.initialFluids));
+          break;
+
+        case 'eyemed':
+          drugs = state.drugs.concat(Object.assign({}, this.initialEyes));
+          break;
+        }
+        break;
+
+      case 'delMed':
+        drugs = state.drugs.filter((drug, jndex) => index !== jndex);
+        break;
+      }
+
+      return { drugs };
+    });
+  }
+
+  medChange(event, index) {
+    // console.log(`medchange index ${index}, name ${event.target.name}, value ${event.target.value}`, event);
+    if (event.target.name == 'addType') {
+      this.setState({ 'addType': event.target.value });
+    } else {
+      this.setState(state => {
+        const drugs = state.drugs.map((drug, jndex) => {
+          if (jndex === index) {
+            const moddrug = Object.assign({}, drug); // remember this is a shallow copy and will break, will need to special case for nested arrays and objects
+            switch (drug.what) {
+            case 'drug': {
+              switch (event.target.name) {
+
+              case 'dose':
+                if (regex.float.test(event.target.value)) {
+                  // eslint-disable-next-line no-case-declarations
+                  const dose = event.target.value;
+                  moddrug[event.target.name] = dose;
+                  if (regex.concentration.test(drug.type)) {
+                    // eslint-disable-next-line no-case-declarations
+                    const concentration = drug.type.match(regex.concentration);
+                    moddrug.amount = Math.round((this.state.weight * dose / concentration[2]) * 100) / 100;
+                    moddrug.amount = (moddrug.amount === 0) ? 0.01 : moddrug.amount;
+                  }
+                }
+                break;
+
+              case 'type':
+                // console.log('event');
+                moddrug[event.target.name] = event.target.value;
+                if (regex.concentration.test(event.target.value)) {
+                  // eslint-disable-next-line no-case-declarations
+                  const concentration = event.target.value.match(regex.concentration);
+                  moddrug.amount = Math.round((this.state.weight * drug.dose / concentration[2]) * 100) / 100;
+                  moddrug.amount = (moddrug.amount === 0) ? 0.01 : moddrug.amount;
+                }
+                break;
+
+              default:
+                moddrug[event.target.name] = event.target.value;
+                break;
+              }
+              break;
+            }
+
+            case 'fluid': {
+              switch (event.target.name) {
+
+              case 'percentBW':
+                if (regex.float.test(event.target.value)) {
+                  moddrug[event.target.name] = event.target.value;
+                  moddrug.amount = ((this.state.weight * 1000) * (event.target.value / 100));
+                }
+                break;
+
+              case 'amount':
+                if (event.target.value === 'load') {
+                  moddrug.amount = ((this.state.weight * 1000) * (2 / 100));
+                } else if (regex.float.test(event.target.value)) {
+                  moddrug[event.target.name] = event.target.value;
+                }
+                break;
+
+              default:
+                moddrug[event.target.name] = event.target.value;
+                break;
+              }
+              break;
+            }
+
+            case 'eyemed': {
+              moddrug[event.target.name] = event.target.value;
+              break;
+            }
+            }
+
+            return moddrug;
+          } else {
+            return drug;
+          }
+        });
+        return { drugs };
+      });
+    }
+  }
+
+  render() {
+    return (
+      <div >
+        <form className="Intake-form" onSubmit={this.handleSubmit}>
+          <div className="Intake-toprow">
+            <div>
+              <label>Case #: </label>
+              <input className="Intake-year" name="year" type="text" value={this.state.year} onChange={this.handleChange} />
+              -
+              <input className="Intake-id" name="id" type="text" value={this.state.case} onChange={this.handleChange} autoComplete="off" />
+              <br />
+              <label>Species: </label>
+              <input className="Intake-species" name="species" type="text" value={this.state.species} onChange={this.handleChange} />
+            </div>
+            <div>
+              <label>Weight: </label>
+              <input className="Intake-weight" name="dispweight" type="text" value={this.state.dispweight} onChange={this.handleChange} />
+              <select name="weightunit" value={this.state.weightunit} onChange={this.handleChange}>
+                <option value="grams">Grams</option>
+                <option value="kilos">Kilograms</option>
+              </select>
+              <br />
+              <label className="Intake-localttext">on </label>
+              <input className="Intake-weight-date" name="weightdate" type="date" value={this.state.weightdate} onChange={this.handleChange} />
+            </div>
+            <div>
+              <label>Location: </label>
+              <select name="locarea" value={this.state.locarea} onChange={this.handleChange}>
+                <option value="">Area:</option>
+                <RenderOptions type="location" stage="areas" arc={this.props.arc} />
+              </select>
+              <select name="locroom" value={this.state.locroom} onChange={this.handleChange}>
+                <option value="">Room:</option>
+                <RenderOptions type="location" stage="rooms" value={this.state.locarea} arc={this.props.arc} />
+              </select>
+              <select name="loccage" value={this.state.loccage} onChange={this.handleChange}>
+                <option value="">Cage:</option>
+                <RenderOptions type="location" stage="cages" value={this.state.locroom} arc={this.props.arc} />
+              </select>
+              <br />
+              <label className="Intake-localttext">Or Manually Input: </label>
+              <input className="Intake-localt" placeholder="Room" name="locroomalt" type="text" value={this.state.locroomalt} onChange={this.handleChange} />
+              <input className="Intake-localt" placeholder="Cage" name="loccagealt" type="text" value={this.state.loccagealt} onChange={this.handleChange} />
+            </div>
+            <div>
+              <label className="Intake-wrtext" >Intake by:</label>
+              <br />
+              <select name="intakeWR" value={this.state.intakeWR} onChange={this.handleChange}>
+                <option value="">...</option>
+                <RenderOptions type="rehabbers" arc={this.props.arc} />
+              </select>
+            </div>
+          </div>
+          <MedCapsule drugs={this.state.drugs} arc={this.props.arc} type={this.state.addType} onClick={this.medClick} onChange={this.medChange} />
+          <input type="submit" value="Submit" />
+
+        </form>
+      </div>
+    );
+  }
+}
+
+function RenderOptions(props) {
+  switch (props.type) {
+  case 'location': {
+    if (!props.arc) {return null;}
+    if (props.stage == 'areas') {
+      return (
+        <React.Fragment>
+          {props.arc.locations.areas.map(element => (
+            <option value={element} key={element}>{element}</option>
+          ))}
+        </React.Fragment>
+      );
+    } else if (props.value && props.arc.locations[props.stage][props.value]) {
+      return (
+        <React.Fragment>
+          {props.arc.locations[props.stage][props.value].map(element => (
+            <option value={element} key={element}>{element}</option>
+          ))
+          }
+        </React.Fragment>
+      );
+    } else {return null;}
+  }
+
+  case 'drug': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.drugs.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'fluid': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.fluids.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'eyemed': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.eyemeds.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'types': {
+    if (!props.reference) {return null;}
+    return (
+      <React.Fragment>
+        {props.reference.options.map((element, index) => (
+          <option value={`${element.typem}*${element.amount}`} key={index}>{`${element.amount} ${(element.typem == 'liquid') ? 'mg/ml' : 'mg'} ${element.typeh}`}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'fluidroute': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.routes.fluids.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'drugroute': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.routes.drugs.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'eyeroute': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.routes.eyes.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  case 'rehabbers': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.rehabbers.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
+  default: {
+    return null;
+  }
+  }
+}
+
+class MedCapsule extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onClick = this.onClick.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  onClick(event, index) {
+    this.props.onClick(event, index);
+  }
+
+  handleChange(event, index) {
+    this.props.onChange(event, index);
+  }
+
+  render() {
+    const meds = [];
+    for (let i = 0; i < this.props.drugs.length; i++) {
+      switch (this.props.drugs[i].what) {
+      case 'drug':
+        meds.push(<MedForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        break;
+
+      case 'fluid':
+        meds.push(<FluidForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        break;
+
+      case 'eyemed':
+        meds.push(<EyeForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        break;
+      }
+    }
+    return (
+      <div>
+        {meds}
+        <select name="addType" value={this.props.type} onChange={this.handleChange}>
+          <option value="drug">drug</option>
+          <option value="fluid">fluid</option>
+          <option value="eyemed">eyemed</option>
+        </select>
+        <button type="button" name="addMed" onClick={this.onClick}>Add</button>
+      </div>
+    );
+  }
+}
+
+class MedForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.state = {
+      reference: {
+        'arcname':'',
+        'genericname':'',
+        'brands':[],
+        'type':'',
+        'options':[],
+        'dose':{},
+      },
+      selectedType: 'liquid',
+    };
+  }
+
+  handleChange(event) {
+    this.props.onChange(event, this.props.id);
+    switch (event.target.name) {
+    case 'arcname':
+      if (this.props.arc.drugs.includes(event.target.value)) {
+        fetch('/drugs', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            'code':event.target.value,
+          }),
+        }).then((response) => response.json())
+          .then((json) => {
+            // console.log(json);
+            this.setState({ reference:json });
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+      break;
+
+    case 'type':
+      if (event.target.value.startsWith('liquid')) {
+        this.setState({ selectedType: 'liquid' });
+      } else {this.setState({ selectedType: 'pill' });}
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  onClick(event) {
+    this.props.onClick(event, this.props.id);
+  }
+
+  render() {
+    return (
+      <div className="Intake-med-box">
+        <div>
+          <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
+        </div>
+        <div>
+          <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
+          <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
+        </div>
+        <div>
+          <label>Drug: </label>
+          <select name="arcname" value={this.props.drug.arcname} onChange={this.handleChange}>
+            <option value="">Select...</option>
+            <RenderOptions type="drug" arc={this.props.arc} />
+          </select>
+          <br />
+          <label className="Intake-med-drugttext">Or Manually Input: </label>
+          <input className="Intake-med-drugt" placeholder="Drug" name="arcname" type="text" value={this.props.drug.arcname} onChange={this.handleChange} />
+        </div>
+        <div>
+          <label>Type: </label>
+          <select name="type" value={this.props.drug.type} onChange={this.handleChange}>
+            <option value="">Select...</option>
+            <RenderOptions type="types" reference={this.state.reference} />
+          </select>
+          <br />
+          <label className="Intake-med-drugutext" >Dose at: </label>
+          <input className="Intake-med-dose" name="dose" type="text" value={this.props.drug.dose} onChange={this.handleChange} />
+          <label className="Intake-med-drugutext" >mg/kg = </label>
+          <input className="Intake-med-amount" name="amount" type="text" value={this.props.drug.amount} onChange={this.handleChange} />
+          <label className="Intake-med-drugutext" >{(this.state.selectedType == 'liquid') ? 'ml' : 'tabs'}</label>
+        </div>
+        <div>
+          <label>Route: </label>
+          <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="drugroute" arc={this.props.arc} />
+          </select>
+          <br />
+          <label className="Intake-med-drugutext">Prescribed by: </label>
+          <select name="prescribedby" value={this.props.drug.prescribedby} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="rehabbers" arc={this.props.arc} />
+          </select>
+        </div>
+      </div>
+    );
+  }
+}
+
+class FluidForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.state = {};
+  }
+
+  handleChange(event) {
+    this.props.onChange(event, this.props.id);
+  }
+
+  onClick(event) {
+    this.props.onClick(event, this.props.id);
+  }
+
+  componentDidMount() {
+    const event = { // yes I am aware of how terrible this is
+      target: {
+        name: 'amount',
+        value: 'load',
+      },
+    };
+    this.props.onChange(event, this.props.id);
+  }
+
+  render() {
+    return (
+      <div className="Intake-med-box">
+        <div>
+          <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
+        </div>
+        <div>
+          <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
+          <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
+        </div>
+        <div>
+          <label>Fluid: </label>
+          <select name="name" value={this.props.drug.name} onChange={this.handleChange}>
+            <option value="">Select...</option>
+            <RenderOptions type="fluid" arc={this.props.arc} />
+          </select>
+          <br />
+          <label className="Intake-med-drugutext">Additions: </label>
+          <input className="Intake-med-additions" name="additions" type="text" value={this.props.drug.additions} onChange={this.handleChange} />
+        </div>
+        <div>
+          <label className="Intake-med-fluidutext" >% BW: </label>
+          <input className="Intake-med-percent" name="percentBW" type="text" value={this.props.drug.percentBW} onChange={this.handleChange} />
+          <br />
+          <label className="Intake-med-fluidutext" >= </label>
+          <input className="Intake-med-amount" name="amount" type="text" value={this.props.drug.amount} onChange={this.handleChange} />
+          <label className="Intake-med-fluidutext" >ml</label>
+        </div>
+        <div>
+          <label>Route: </label>
+          <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="fluidroute" arc={this.props.arc} />
+          </select>
+          <br />
+          <label className="Intake-med-drugutext">Prescribed by: </label>
+          <select name="prescribedby" value={this.props.drug.prescribedby} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="rehabbers" arc={this.props.arc} />
+          </select>
+        </div>
+      </div>
+    );
+  }
+}
+
+class EyeForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.state = {};
+  }
+
+  handleChange(event) {
+    this.props.onChange(event, this.props.id);
+  }
+
+  onClick(event) {
+    this.props.onClick(event, this.props.id);
+  }
+
+  render() {
+    return (
+      <div className="Intake-med-box">
+        <div>
+          <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
+        </div>
+        <div>
+          <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
+          <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
+        </div>
+        <div>
+          <label>Eyemed: </label>
+          <select name="name" value={this.props.drug.name} onChange={this.handleChange}>
+            <option value="">Select...</option>
+            <RenderOptions type="eyemed" arc={this.props.arc} />
+          </select>
+        </div>
+        <div>
+          <label>Route: </label>
+          <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="eyeroute" arc={this.props.arc} />
+          </select>
+          <br />
+          <label className="Intake-med-drugutext">Prescribed by: </label>
+          <select name="prescribedby" value={this.props.drug.prescribedby} onChange={this.handleChange}>
+            <option value="">...</option>
+            <RenderOptions type="rehabbers" arc={this.props.arc} />
+          </select>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default IntakeForm;
