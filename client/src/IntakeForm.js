@@ -2,15 +2,20 @@ import './App.css';
 import React from 'react';
 import * as regex from './regexes.js';
 
+function genDateStr() {
+  const date = new Date();
+  let month = (date.getMonth() + 1).toString();
+  if (month.length == 1) {month = '0' + month;}
+  let day = date.getDate().toString();
+  if (day.length == 1) {day = '0' + day;}
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
 class IntakeForm extends React.Component {
   constructor(props) {
     super(props);
+    const datestr = genDateStr();
     const date = new Date();
-    let month = (date.getMonth() + 1).toString();
-    if (month.length == 1) {month = '0' + month;}
-    let day = date.getDate().toString();
-    if (day.length == 1) {day = '0' + day;}
-    const datestr = `${date.getFullYear()}-${month}-${day}`;
     this.initialState = {
       year: date.getFullYear() % 100,
       id: '',
@@ -35,11 +40,13 @@ class IntakeForm extends React.Component {
       'dose':'',
       'amount':'',
       'route':'',
-      'startdate':'isodate',
-      'schedule':'string - BID, SID',
-      'doses':'int - 10',
-      'when':['date'],
+      'startdate':datestr,
+      'starttime':'AM',
+      'schedule':'',
+      'doses':1,
+      'when':[],
       'prescribedby':'',
+      'mode':'auto',
     };
     this.initialFluids = {
       'what':'fluid',
@@ -48,27 +55,36 @@ class IntakeForm extends React.Component {
       'percentBW':2,
       'amount':'',
       'route':'',
-      'startdate':'isodate',
-      'schedule':'string - BID, SID',
-      'doses':'int - 10',
-      'when':['date'],
+      'startdate':datestr,
+      'starttime':'AM',
+      'schedule':'',
+      'doses':1,
+      'when':[],
       'prescribedby':'',
+      'mode':'auto',
     };
     this.initialEyes = {
       'what':'eyemed',
       'name':'',
       'route':'',
-      'startdate':'isodate',
-      'schedule':'string - BID, SID',
-      'doses':'int - 10',
-      'when':['date'],
+      'startdate':datestr,
+      'starttime':'AM',
+      'schedule':'',
+      'doses':1,
+      'when':[],
       'prescribedby':'',
+      'mode':'auto',
+    };
+    this.initialWhen = {
+      'date':datestr,
+      'time':'AM',
     };
     this.state = this.initialState;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.medClick = this.medClick.bind(this);
     this.medChange = this.medChange.bind(this);
+    this.schChange = this.schChange.bind(this);
   }
 
   handleChange(event) {
@@ -121,10 +137,21 @@ class IntakeForm extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    // const target = event.target;
-    // const name = target.name;
-    // this.setState({ [name]: this.initialState[name] });
     console.log(this.state);
+    fetch('/intake', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(this.state),
+    }).then((response) => response.json())
+      .then((json) => {
+        console.log(json);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   medClick(event, index) {
@@ -151,6 +178,36 @@ class IntakeForm extends React.Component {
 
       case 'delMed':
         drugs = state.drugs.filter((drug, jndex) => index !== jndex);
+        break;
+
+      case 'addDose':
+        drugs = state.drugs.map((drug, jndex) => {
+          if (jndex === index) {
+            const moddrug = Object.assign({}, drug);
+            moddrug.when = drug.when.concat(Object.assign({}, this.initialWhen));
+            return moddrug;
+          } else { return drug; }
+        });
+        break;
+
+      case 'removeDose':
+        drugs = state.drugs.map((drug, jndex) => {
+          if (jndex === index) {
+            const moddrug = Object.assign({}, drug);
+            moddrug.when = drug.when.filter((entry, kndex) => kndex !== (drug.when.length - 1));
+            return moddrug;
+          } else { return drug; }
+        });
+        break;
+
+      case 'mode':
+        drugs = state.drugs.map((drug, jndex) => {
+          if (jndex === index) {
+            const moddrug = Object.assign({}, drug);
+            moddrug.mode = (moddrug.mode === 'auto') ? 'manual' : 'auto';
+            return moddrug;
+          } else { return drug; }
+        });
         break;
       }
 
@@ -196,6 +253,12 @@ class IntakeForm extends React.Component {
                 }
                 break;
 
+              case 'doses':
+                if (regex.int.test(event.target.value)) {
+                  moddrug[event.target.name] = event.target.value;
+                }
+                break;
+
               default:
                 moddrug[event.target.name] = event.target.value;
                 break;
@@ -221,6 +284,12 @@ class IntakeForm extends React.Component {
                 }
                 break;
 
+              case 'doses':
+                if (regex.int.test(event.target.value)) {
+                  moddrug[event.target.name] = event.target.value;
+                }
+                break;
+
               default:
                 moddrug[event.target.name] = event.target.value;
                 break;
@@ -229,7 +298,18 @@ class IntakeForm extends React.Component {
             }
 
             case 'eyemed': {
-              moddrug[event.target.name] = event.target.value;
+              switch (event.target.name) {
+
+              case 'doses':
+                if (regex.int.test(event.target.value)) {
+                  moddrug[event.target.name] = event.target.value;
+                }
+                break;
+
+              default:
+                moddrug[event.target.name] = event.target.value;
+                break;
+              }
               break;
             }
             }
@@ -242,6 +322,28 @@ class IntakeForm extends React.Component {
         return { drugs };
       });
     }
+  }
+
+  schChange(event, outerindex, innerindex) {
+    this.setState(state => {
+      let drugs = state.drugs;
+      drugs = state.drugs.map((drug, jndex) => {
+        if (jndex === outerindex) {
+          const moddrug = Object.assign({}, drug);
+          let when = moddrug.when;
+          when = moddrug.when.map((date, kndex) => {
+            if (kndex === innerindex) {
+              const moddate = Object.assign({}, date);
+              moddate[event.target.name] = event.target.value;
+              return moddate;
+            } else { return date; }
+          });
+          moddrug.when = when;
+          return moddrug;
+        } else { return drug; }
+      });
+      return { drugs };
+    });
   }
 
   render() {
@@ -297,7 +399,7 @@ class IntakeForm extends React.Component {
               </select>
             </div>
           </div>
-          <MedCapsule drugs={this.state.drugs} arc={this.props.arc} type={this.state.addType} onClick={this.medClick} onChange={this.medChange} />
+          <MedCapsule drugs={this.state.drugs} arc={this.props.arc} type={this.state.addType} onClick={this.medClick} onChange={this.medChange} schChange={this.schChange}/>
           <input type="submit" value="Submit" />
 
         </form>
@@ -418,6 +520,17 @@ function RenderOptions(props) {
     );
   }
 
+  case 'schedules': {
+    if (!props.arc) {return null;}
+    return (
+      <React.Fragment>
+        {props.arc.schedules.map(element => (
+          <option value={element} key={element}>{element}</option>
+        ))}
+      </React.Fragment>
+    );
+  }
+
   default: {
     return null;
   }
@@ -429,6 +542,11 @@ class MedCapsule extends React.Component {
     super(props);
     this.onClick = this.onClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.schChange = this.schChange.bind(this);
+  }
+
+  schChange(event, outerindex, innerindex) {
+    this.props.schChange(event, outerindex, innerindex);
   }
 
   onClick(event, index) {
@@ -444,15 +562,15 @@ class MedCapsule extends React.Component {
     for (let i = 0; i < this.props.drugs.length; i++) {
       switch (this.props.drugs[i].what) {
       case 'drug':
-        meds.push(<MedForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        meds.push(<MedForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} schChange={this.schChange} />);
         break;
 
       case 'fluid':
-        meds.push(<FluidForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        meds.push(<FluidForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} schChange={this.schChange} />);
         break;
 
       case 'eyemed':
-        meds.push(<EyeForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+        meds.push(<EyeForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} schChange={this.schChange} />);
         break;
       }
     }
@@ -475,6 +593,7 @@ class MedForm extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.schChange = this.schChange.bind(this);
     this.state = {
       reference: {
         'arcname':'',
@@ -486,6 +605,10 @@ class MedForm extends React.Component {
       },
       selectedType: 'liquid',
     };
+  }
+
+  schChange(event, index) {
+    this.props.schChange(event, this.props.id, index);
   }
 
   handleChange(event) {
@@ -531,14 +654,14 @@ class MedForm extends React.Component {
   render() {
     return (
       <div className="Intake-med-box">
-        <div>
+        <div className="Intake-med-section">
           <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
           <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Drug: </label>
           <select name="arcname" value={this.props.drug.arcname} onChange={this.handleChange}>
             <option value="">Select...</option>
@@ -548,7 +671,7 @@ class MedForm extends React.Component {
           <label className="Intake-med-drugttext">Or Manually Input: </label>
           <input className="Intake-med-drugt" placeholder="Drug" name="arcname" type="text" value={this.props.drug.arcname} onChange={this.handleChange} />
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Type: </label>
           <select name="type" value={this.props.drug.type} onChange={this.handleChange}>
             <option value="">Select...</option>
@@ -561,7 +684,7 @@ class MedForm extends React.Component {
           <input className="Intake-med-amount" name="amount" type="text" value={this.props.drug.amount} onChange={this.handleChange} />
           <label className="Intake-med-drugutext" >{(this.state.selectedType == 'liquid') ? 'ml' : 'tabs'}</label>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Route: </label>
           <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
             <option value="">...</option>
@@ -574,6 +697,103 @@ class MedForm extends React.Component {
             <RenderOptions type="rehabbers" arc={this.props.arc} />
           </select>
         </div>
+        <DrugSchedule arc={this.props.arc} drug={this.props.drug} reference={this.state.reference} onChange={this.handleChange} onClick={this.onClick} schChange={this.schChange}/>
+      </div>
+    );
+  }
+}
+
+class DrugSchedule extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.onClick = this.onClick.bind(this);
+    this.handleSchChange = this.handleSchChange.bind(this);
+  }
+
+  onClick(event) {
+    this.props.onClick(event);
+  }
+  handleSchChange(event, index) {
+    this.props.schChange(event, index);
+  }
+
+  handleChange(event) {
+    this.props.onChange(event);
+  }
+
+  render() {
+    let content;
+    if (this.props.drug.mode === 'auto') {
+      content = (
+        <React.Fragment>
+          <div className="Intake-med-section">
+            <button className="Intake-med-modebtn" type="button" name="mode" onClick={this.onClick}>Mode</button>
+          </div>
+          <div className="Intake-med-section">
+            <select name="schedule" value={this.props.drug.schedule} onChange={this.handleChange}>
+              <option value="">...</option>
+              <RenderOptions type="schedules" arc={this.props.arc} />
+            </select>
+            <label>For </label>
+            <input className="Intake-med-doses" name="doses" type="text" value={this.props.drug.doses} onChange={this.handleChange} />
+            <label> doses</label>
+            <br />
+            <label>Starting on </label>
+            <input name="startdate" type="date" value={this.props.drug.startdate} onChange={this.handleChange} />
+            <select name="starttime" value={this.props.drug.starttime} onChange={this.handleChange} >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
+        </React.Fragment>
+      );
+    } else {
+      const when = [];
+      for (let i = 0; i < this.props.drug.when.length; i++) {
+        when.push(<ScheduleEntry key={i} id={i} when={this.props.drug.when[i]} onChange={this.handleSchChange} />);
+      }
+      // <EyeForm key={i} id={i} drug={this.props.drugs[i]} arc={this.props.arc} onClick={this.onClick} onChange={this.handleChange} />);
+      content = (
+        <>
+          <div className="Intake-med-section">
+            <div className="Intake-med-manual-buttons">
+              <button className="Intake-med-modebtn" type="button" name="mode" onClick={this.onClick}>Mode</button>
+              <button type="button" name="addDose" onClick={this.onClick}>+ dose</button>
+              <button type="button" name="removeDose" onClick={this.onClick}>- dose</button>
+            </div>
+          </div>
+          <div className="Intake-med-section">
+            <div className="Intake-med-manual-cont" >
+              {when}
+            </div>
+          </div>
+        </>
+      );
+    }
+    return (content);
+  }
+}
+
+class ScheduleEntry extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.onChange(event, this.props.id);
+  }
+
+  render() {
+    return (
+      <div>
+        <label className="Intake-med-scheduletext"> {this.props.id + 1}. </label>
+        <input name="date" type="date" value={this.props.when.date} onChange={this.handleChange} />
+        <select name="time" value={this.props.when.time} onChange={this.handleChange} >
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
       </div>
     );
   }
@@ -584,7 +804,12 @@ class FluidForm extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.schChange = this.schChange.bind(this);
     this.state = {};
+  }
+
+  schChange(event, index) {
+    this.props.schChange(event, this.props.id, index);
   }
 
   handleChange(event) {
@@ -608,14 +833,14 @@ class FluidForm extends React.Component {
   render() {
     return (
       <div className="Intake-med-box">
-        <div>
+        <div className="Intake-med-section">
           <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
           <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Fluid: </label>
           <select name="name" value={this.props.drug.name} onChange={this.handleChange}>
             <option value="">Select...</option>
@@ -625,7 +850,7 @@ class FluidForm extends React.Component {
           <label className="Intake-med-drugutext">Additions: </label>
           <input className="Intake-med-additions" name="additions" type="text" value={this.props.drug.additions} onChange={this.handleChange} />
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label className="Intake-med-fluidutext" >% BW: </label>
           <input className="Intake-med-percent" name="percentBW" type="text" value={this.props.drug.percentBW} onChange={this.handleChange} />
           <br />
@@ -633,7 +858,7 @@ class FluidForm extends React.Component {
           <input className="Intake-med-amount" name="amount" type="text" value={this.props.drug.amount} onChange={this.handleChange} />
           <label className="Intake-med-fluidutext" >ml</label>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Route: </label>
           <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
             <option value="">...</option>
@@ -646,6 +871,7 @@ class FluidForm extends React.Component {
             <RenderOptions type="rehabbers" arc={this.props.arc} />
           </select>
         </div>
+        <DrugSchedule arc={this.props.arc} drug={this.props.drug} reference={this.state.reference} onChange={this.handleChange} onClick={this.onClick} schChange={this.schChange}/>
       </div>
     );
   }
@@ -656,7 +882,12 @@ class EyeForm extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.onClick = this.onClick.bind(this);
+    this.schChange = this.schChange.bind(this);
     this.state = {};
+  }
+
+  schChange(event, index) {
+    this.props.schChange(event, this.props.id, index);
   }
 
   handleChange(event) {
@@ -670,21 +901,21 @@ class EyeForm extends React.Component {
   render() {
     return (
       <div className="Intake-med-box">
-        <div>
+        <div className="Intake-med-section">
           <button className="Intake-med-delbtn" type="button" name="delMed" onClick={this.onClick}>Remove</button>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label className="Intake-med-drugstext">Tx #{this.props.id + 1}</label><br />
           <label className="Intake-med-drugrtext">{this.props.drug.what}</label><br />
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Eyemed: </label>
           <select name="name" value={this.props.drug.name} onChange={this.handleChange}>
             <option value="">Select...</option>
             <RenderOptions type="eyemed" arc={this.props.arc} />
           </select>
         </div>
-        <div>
+        <div className="Intake-med-section">
           <label>Route: </label>
           <select name="route" value={this.props.drug.route} onChange={this.handleChange}>
             <option value="">...</option>
@@ -697,6 +928,7 @@ class EyeForm extends React.Component {
             <RenderOptions type="rehabbers" arc={this.props.arc} />
           </select>
         </div>
+        <DrugSchedule arc={this.props.arc} drug={this.props.drug} reference={this.state.reference} onChange={this.handleChange} onClick={this.onClick} schChange={this.schChange}/>
       </div>
     );
   }

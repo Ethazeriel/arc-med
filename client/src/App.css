@@ -130,10 +130,12 @@ text-align: left;
 .Intake-med-box {
   background-color: #333741;
   display: flex;
+  flex-wrap:wrap;
   margin-top: 0.5em;
+  font-size: calc(10px + 1vmin);
 }
 
-.Intake-med-box div {
+.Intake-med-section {
   border-left: 1px solid grey;
   border-right: 1px solid grey;
   padding: 0.25em;
@@ -171,6 +173,10 @@ text-align: left;
   width:3em;
 }
 
+.Intake-med-doses {
+  width:2em;
+}
+
 .Intake-med-additions {
   width:8em;
 }
@@ -187,4 +193,20 @@ text-align: left;
 .Intake-med-fluidutext {
   font-size: calc(10px + 1vmin);
   font-style: italic;
+}
+
+.Intake-med-scheduletext {
+  font-size: calc(10px + 0.5vmin);
+}
+
+.Intake-med-manual-cont {
+  display: flex;
+  flex-wrap:wrap;
+  max-width: 32vw;
+  justify-content: space-around;
+}
+
+.Intake-med-manual-buttons {
+  display: flex;
+  flex-direction: column;
 }

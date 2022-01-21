@@ -39,6 +39,12 @@ app.post('/drugs', async (req, res) => {
   res.json(result);
 });
 
+app.post('/intake', async (req, res) => {
+  logLine('post', [`Endpoint ${chalk.blue('/intake')}, code ${chalk.green(`${req.body.year}-${req.body.id}`)}`]);
+  console.log(req.body);
+  res.json({ status: 'received' });
+});
+
 app.listen(port, () => {
   logLine('info', [`Backend listening at http://localhost:${port}, Node version: ${process.version}`]);
   logDebug(chalk.red.bold('DEBUG MODE ACTIVE'));
