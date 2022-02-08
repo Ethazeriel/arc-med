@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
 const db = require('./database.js');
-const { logLine } = require('./logger.js');
+const { logLine, logDebug } = require('./logger.js');
 const { regexes } = require('./regexes.js');
 const arc = require('./arc.json');
 
@@ -86,9 +85,8 @@ async function injest(newpatient) {
     drugindex++;
   }
 
-  console.log(safepatient);
-  const result = await db.insertPatient(safepatient);
-  console.log(result);
+  logDebug(safepatient);
+  await db.insertPatient(safepatient);
   return { status:'success', value:'Valid Intake' };
 }
 exports.injest = injest;
