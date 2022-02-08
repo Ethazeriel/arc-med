@@ -109,6 +109,23 @@ async function list(query, collection) {
   }
 }
 
+async function insertPatient(thing) { // arc v1
+  // inserts a single thing into the database
+  try {
+    const tracks = db.collection('patients');
+    // check if we already have this url
+    const test = await tracks.findOne({ $and: [{ year: thing.year }, { id: thing.id }] });
+    if (test == null || test.id != thing.id) {
+      // we don't have this in our database yet, so
+      const result = await tracks.insertOne(thing);
+      logLine('database', [`Adding: ${chalk.green(thing.year)}-${chalk.green(thing.id)} to database ${chalk.blue('patients')}`]);
+      return result;
+    } else { throw new Error(`Code ${chalk.green(thing.year)}-${chalk.green(thing.id)} already exists! (${'patients'})`);}
+    // console.log(track);
+  } catch (error) {
+    logLine('error', ['database error:', error.message]);
+  }
+}
 
 exports.get = get;
 exports.insert = insert;
@@ -117,3 +134,4 @@ exports.closeDB = closeDB;
 exports.remove = remove;
 exports.update = update;
 exports.list = list;
+exports.insertPatient = insertPatient;

@@ -17,3 +17,21 @@ const sanitize = /([^\w :/.?=&-])+/g;
 exports.sanitize = sanitize;
 exports.spotifyPattern = spotifyPattern;
 exports.youtubePattern = youtubePattern;
+
+const regexes = {
+  sanitize: /([^\w :/.?=&*-])+/g,
+  year: /^([\d]){2}$/,
+  id: /^([\d]{4})([a-z]?)$/,
+  species: /^[A-Z]{4}$/,
+  weightdate: /^[\d]{4}-[\d]{2}-[\d]{2}$/,
+  float: /^(\d*\.{0,1}\d+)$/,
+  int: /^(\d+)$/,
+  alphanum: /([\w .-])*/,
+  WR: /^[A-Z]{2,3}$/,
+  drugtype: /(?:(\w+)\*(\d*\.{0,1}\d+))/,
+  dosemode: /^auto$|^manual$/,
+  time: /^AM$|^PM$/,
+  fluidextra: /([\w% .-])*/,
+};
+
+exports.regexes = regexes;

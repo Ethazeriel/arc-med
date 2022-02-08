@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const express = require('express');
 const path = require('path');
 const { logLine, logDebug } = require('./logger.js');
+const { injest } = require('./injest.js');
 const chalk = require('chalk');
 const arc = require('./arc.json');
 const app = express();
@@ -41,8 +42,10 @@ app.post('/drugs', async (req, res) => {
 
 app.post('/intake', async (req, res) => {
   logLine('post', [`Endpoint ${chalk.blue('/intake')}, code ${chalk.green(`${req.body.year}-${req.body.id}`)}`]);
-  console.log(req.body);
-  res.json({ status: 'received' });
+  // console.log(req.body);
+  const newintake = req.body;
+  const response = await injest(newintake);
+  res.json(response);
 });
 
 app.listen(port, () => {

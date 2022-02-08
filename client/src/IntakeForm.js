@@ -120,6 +120,23 @@ class IntakeForm extends React.Component {
     case 'locroom':
       this.setState({ locroom: value });
       this.setState({ loccage: '' });
+      this.setState({ locroomalt: '' });
+      break;
+
+    case 'loccage':
+      this.setState({ loccage: value });
+      this.setState({ loccagealt: '' });
+      break;
+
+    case 'locroomalt':
+      this.setState({ locroomalt: value });
+      this.setState({ locroom: '' });
+      this.setState({ loccage: '' });
+      break;
+
+    case 'loccagealt':
+      this.setState({ loccagealt: value });
+      this.setState({ loccage: '' });
       break;
 
     case 'intakeWR':

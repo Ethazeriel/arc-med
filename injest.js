@@ -1,0 +1,212 @@
+/* eslint-disable no-console */
+const db = require('./database.js');
+const { logLine } = require('./logger.js');
+const { regexes } = require('./regexes.js');
+const arc = require('./arc.json');
+
+async function injest(newpatient) {
+  const safepatient = {};
+
+  const year = Number(newpatient?.year);
+  if (!regexes.year.test(year)) {return { status:'error', error:'Invalid year' };}
+  safepatient.year = year;
+
+  const id = newpatient?.id?.replace(regexes.sanitize, '').trim();
+  if (!regexes.id.test(id)) {return { status:'error', error:'Invalid id' };}
+  const idmatch = id.match(/^([\d]{4})([a-z]?)$/);
+  safepatient.id = Number(idmatch[1]);
+  if (idmatch[2]) {safepatient.family = idmatch[2];}
+
+  const preexisting = null;// await db.get({ $and: [{ year: newpatient.year }, { id: newpatient.id }] }, 'patients');
+  if (preexisting) {logLine('info', [`${year}-${id} already exists, updating existing file`]);}
+  // TODO - REMEMBER TO DO THIS
+
+  const species = newpatient?.species?.replace(regexes.sanitize, '').trim();
+  if (!regexes.species.test(species)) {return { status:'error', error:'Invalid species' };}
+  const speciestest = await db.get({ id:species }, 'species');
+  if (!speciestest) {return { status:'error', error:'Species not in database' };}
+  safepatient.species = species;
+
+  const weightdate = newpatient?.weightdate?.replace(regexes.sanitize, '').trim();
+  const weight = Number(newpatient?.weight);
+  if (!regexes.weightdate.test(weightdate)) {return { status:'error', error:'Invalid weight datestamp' };}
+  if (!regexes.float.test(weight)) {return { status:'error', error:'Invalid weight value' };}
+  safepatient.weight = {
+    timestamp: weightdate,
+    kilos: weight,
+  };
+
+  const locarea = newpatient?.locarea?.replace(regexes.sanitize, '').trim();
+  const locroom = newpatient?.locroom?.replace(regexes.sanitize, '').trim() || newpatient?.locroomalt?.replace(regexes.sanitize, '').trim();
+  const loccage = newpatient?.loccage?.replace(regexes.sanitize, '').trim() || newpatient?.loccagealt?.replace(regexes.sanitize, '').trim();
+  if (!regexes.alphanum.test(locarea)) {return { status:'error', error:'Invalid Location (area)' };}
+  if (!regexes.alphanum.test(locroom)) {return { status:'error', error:'Invalid Location (room)' };}
+  if (!regexes.alphanum.test(loccage)) {return { status:'error', error:'Invalid Location (cage)' };}
+  safepatient.location = {
+    area: locarea,
+    room: locroom,
+    cage: loccage,
+  };
+
+  const intakeWR = newpatient?.intakeWR?.replace(regexes.sanitize, '').trim();
+  if (!regexes.WR.test(intakeWR)) {return { status:'error', error:'Invalid Intake WR' };}
+  safepatient.intakeWR = intakeWR;
+
+  safepatient.drugs = [];
+  let drugindex = 0;
+  if (!Array.isArray(newpatient.drugs)) {return { status:'error', error:'Invalid drug array' };}
+  for (const newdrug of newpatient.drugs) {
+    if (!newdrug.what) {return { status:'error', error:`Invalid type for drug ${drugindex + 1}` };}
+    switch (newdrug.what) {
+
+    case 'drug':
+      try {
+        const safedrug = processDrug(newdrug);
+        safepatient.drugs.push(safedrug);
+      } catch (error) { return { status:'error', error:`${error.message} at drug ${drugindex + 1}` }; }
+      break;
+
+    case 'fluid':
+      try {
+        const safedrug = processFluid(newdrug);
+        safepatient.drugs.push(safedrug);
+      } catch (error) { return { status:'error', error:`${error.message} at drug ${drugindex + 1}` }; }
+      break;
+
+    case 'eyemed':
+      try {
+        const safedrug = processEyemed(newdrug);
+        safepatient.drugs.push(safedrug);
+      } catch (error) { return { status:'error', error:`${error.message} at drug ${drugindex + 1}` }; }
+      break;
+
+    default:
+      return { status:'error', error:`Invalid type for drug ${drugindex + 1}` };
+    }
+    drugindex++;
+  }
+
+  console.log(safepatient);
+  const result = await db.insertPatient(safepatient);
+  console.log(result);
+  return { status:'success', value:'Valid Intake' };
+}
+exports.injest = injest;
+
+function processDrug(newdrug) {
+  let safedrug = { what: 'drug' };
+
+  const arcname = newdrug?.arcname?.replace(regexes.sanitize, '').trim();
+  if (!regexes.alphanum.test(arcname)) {Error('Invalid arcname');}
+  safedrug.arcname = arcname;
+
+  const type = newdrug?.type?.replace(regexes.sanitize, '').trim();
+  if (!regexes.drugtype.test(type)) {Error('Invalid type');}
+  safedrug.type = type;
+
+  const dose = Number(newdrug?.dose);
+  if (!regexes.float.test(dose)) {Error('Invalid dose');}
+  safedrug.dose = dose;
+
+  const amount = Number(newdrug?.amount);
+  if (!regexes.float.test(amount)) {Error('Invalid amount');}
+  safedrug.amount = amount;
+
+  const route = newdrug?.route?.replace(regexes.sanitize, '').trim();
+  if (!regexes.alphanum.test(route)) {Error('Invalid route');}
+  safedrug.route = route;
+
+  const drugWR = newdrug?.prescribedby?.replace(regexes.sanitize, '').trim();
+  if (!regexes.WR.test(drugWR)) {Error('Invalid WR');}
+  safedrug.prescribedby = drugWR;
+
+  safedrug = doSchedule(safedrug, newdrug);
+  return safedrug;
+}
+
+function processFluid(newdrug) {
+  let safedrug = { what: 'fluid' };
+
+  const name = newdrug?.name?.replace(regexes.sanitize, '').trim();
+  if (!arc.fluids.includes(name)) {Error('Invalid fluid type');}
+  safedrug.name = name;
+
+  const additions = newdrug?.additions?.replace(regexes.sanitize, '').trim();
+  if (!regexes.fluidextra.test(additions)) {Error('Invalid fluid addition');}
+  safedrug.additions = additions.length ? additions : null;
+
+  const percent = Number(newdrug?.percentBW);
+  if (!regexes.float.test(percent)) {Error('Invalid percentage');}
+  safedrug.percent = percent;
+
+  const amount = Number(newdrug?.amount);
+  if (!regexes.float.test(amount)) {Error('Invalid quantity');}
+  safedrug.amount = amount;
+
+  const route = newdrug?.route?.replace(regexes.sanitize, '').trim();
+  if (!regexes.alphanum.test(route)) {Error('Invalid route');}
+  safedrug.route = route;
+
+  const drugWR = newdrug?.prescribedby?.replace(regexes.sanitize, '').trim();
+  if (!regexes.WR.test(drugWR)) {Error('Invalid WR');}
+  safedrug.prescribedby = drugWR;
+
+  safedrug = doSchedule(safedrug, newdrug);
+  return safedrug;
+}
+
+function processEyemed(newdrug) {
+  let safedrug = { what: 'eyemed' };
+
+  const name = newdrug?.name?.replace(regexes.sanitize, '').trim();
+  if (!arc.eyemeds.includes(name)) {Error('Invalid eyemed type');}
+  safedrug.name = name;
+
+  const route = newdrug?.route?.replace(regexes.sanitize, '').trim();
+  if (!arc.routes.eyes.includes(route)) {Error('Invalid route');}
+  safedrug.route = route;
+
+  safedrug = doSchedule(safedrug, newdrug);
+  return safedrug;
+}
+
+function doSchedule(safedrug, newdrug) {
+
+  const dosemode = newdrug?.mode?.replace(regexes.sanitize, '').trim();
+  if (!regexes.dosemode.test(dosemode)) {Error('Invalid dosing mode');}
+  if (dosemode === 'auto') {
+
+    safedrug.dosemode = dosemode;
+
+    const startdate = newdrug?.startdate?.replace(regexes.sanitize, '').trim();
+    if (!regexes.weightdate.test(startdate)) {Error('Invalid start datestamp');}
+    const starttime = newdrug?.starttime?.replace(regexes.sanitize, '').trim();
+    if (!regexes.time.test(starttime)) {Error('Invalid start timestamp');}
+    safedrug.startdate = `${startdate}-${starttime}`;
+
+    const schedule = newdrug?.schedule?.replace(regexes.sanitize, '').trim();
+    if (!arc.schedules.includes(schedule)) {Error('Invalid schedule');}
+    safedrug.schedule = schedule;
+
+    const doses = Number(newdrug?.doses);
+    if (!regexes.int.test(doses)) {Error('Invalid number of doses');}
+    safedrug.doses = doses;
+
+  } else {
+
+    safedrug.dosemode = dosemode;
+
+    const when = [];
+    if (!Array.isArray(newdrug?.when)) {Error('Invalid dose array');}
+    for (const element of newdrug.when) {
+      const date = element?.date?.replace(regexes.sanitize, '').trim();
+      if (!regexes.weightdate.test(date)) {Error('Invalid datestamp');}
+      const time = element?.time?.replace(regexes.sanitize, '').trim();
+      if (!regexes.time.test(time)) {Error('Invalid timestamp');}
+      when.push(`${date}-${time}`);
+    }
+    safedrug.when = when;
+
+  }
+  return safedrug;
+}
