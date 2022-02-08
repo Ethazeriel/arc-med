@@ -32,6 +32,7 @@ class IntakeForm extends React.Component {
       drugs:[],
       addType:'drug',
       intakeWR:'',
+      response: {},
     };
     this.initialMeds = {
       'what':'drug',
@@ -165,6 +166,7 @@ class IntakeForm extends React.Component {
     }).then((response) => response.json())
       .then((json) => {
         console.log(json);
+        this.setState({ response:json });
       })
       .catch((error) => {
         console.error(error);
@@ -366,6 +368,7 @@ class IntakeForm extends React.Component {
   render() {
     return (
       <div >
+        <ResponseDisplay response={this.state.response} />
         <form className="Intake-form" onSubmit={this.handleSubmit}>
           <div className="Intake-toprow">
             <div>
@@ -949,6 +952,19 @@ class EyeForm extends React.Component {
       </div>
     );
   }
+}
+
+function ResponseDisplay(props) {
+  if (!Object.keys(props.response).length) {
+    return (null);
+  } else if (props.response.status == 'error') {
+    return (<h3 className="Form-error">Submission error: {props.response.error}</h3>);
+  }
+  return (
+    <div>
+      <h3 className="Form-success">Patient Admitted.</h3>
+    </div>
+  );
 }
 
 export default IntakeForm;

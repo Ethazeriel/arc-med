@@ -78,6 +78,18 @@ text-align: left;
   padding-right: 1em;
 }
 
+.Form-success {
+  font-size: calc(10px + 2vmin);
+  font-family: 'Source Sans Pro', sans-serif;
+  color: white;
+}
+
+.Form-error {
+  font-size: calc(10px + 2vmin);
+  font-family: 'Source Sans Pro', sans-serif;
+  color: white;
+}
+
 .Intake-form {
   /* min-height: 100%; */
   display: flex;
