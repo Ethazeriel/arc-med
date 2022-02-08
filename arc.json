@@ -19,7 +19,7 @@
       "IP":["1", "2", "3", "4", "Kennel"]
     }
   },
-  "schedules": ["OD", "SID", "BID", "TID", "QID", "EOD", "E3D"],
+  "schedules": ["OD", "SID", "BID", "TID", "QID", "EOD", "E3D", "E4D"],
   "drugs":[],
   "fluids":["Normosol", "Isolyte", "0.9% Saline", "0.45% Saline"],
   "eyemeds":["BNP", "BNPH", "Cipro", "Tobrex", "Tobradex", "Atropine"],
