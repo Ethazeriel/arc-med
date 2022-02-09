@@ -32,6 +32,7 @@ const regexes = {
   dosemode: /^auto$|^manual$/,
   time: /^AM$|^PM$/,
   fluidextra: /([\w% .-])*/,
+  datematch: /^([\d]{4})-([\d]{2})-([\d]{2})-?([AP]M)?$/,
 };
 
 exports.regexes = regexes;

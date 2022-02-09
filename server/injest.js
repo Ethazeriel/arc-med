@@ -119,6 +119,7 @@ function processDrug(newdrug) {
   safedrug.prescribedby = drugWR;
 
   safedrug = doSchedule(safedrug, newdrug);
+  safedrug.done = false;
   return safedrug;
 }
 
@@ -150,6 +151,7 @@ function processFluid(newdrug) {
   safedrug.prescribedby = drugWR;
 
   safedrug = doSchedule(safedrug, newdrug);
+  safedrug.done = false;
   return safedrug;
 }
 
@@ -165,6 +167,7 @@ function processEyemed(newdrug) {
   safedrug.route = route;
 
   safedrug = doSchedule(safedrug, newdrug);
+  safedrug.done = false;
   return safedrug;
 }
 
@@ -190,6 +193,8 @@ function doSchedule(safedrug, newdrug) {
     if (!regexes.int.test(doses)) {Error('Invalid number of doses');}
     safedrug.doses = doses;
 
+    safedrug.when = generateWhen(safedrug.startdate, schedule, doses);
+
   } else {
 
     safedrug.dosemode = dosemode;
@@ -207,4 +212,102 @@ function doSchedule(safedrug, newdrug) {
 
   }
   return safedrug;
+}
+
+function generateWhen(date, schedule, doses) {
+  // eslint-disable-next-line prefer-const
+  let [, year, month, day, time] = date.match(regexes.datematch);
+  let stripped = `${year}-${month}-${day}`;
+  const result = [date];
+  switch (schedule) {
+
+  case 'OD':
+    return result;
+
+  case 'SID':
+    for (let i = 1; i < doses; i++) {
+      date = `${nextDay(date)}-${time}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'BID':
+    for (let i = 1; i < doses; i++) {
+      date = (time === 'AM') ? `${stripped}-${time = 'PM'}` : `${stripped = nextDay(stripped)}-${time = 'AM'}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'TID': // we're not actually handling this right now
+    for (let i = 1; i < doses; i++) {
+      date = (time === 'AM') ? `${stripped}-${time = 'PM'}` : `${stripped = nextDay(stripped)}-${time = 'AM'}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'QID': // or this
+    for (let i = 1; i < doses; i++) {
+      date = (time === 'AM') ? `${stripped}-${time = 'PM'}` : `${stripped = nextDay(stripped)}-${time = 'AM'}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'EOD':
+    for (let i = 1; i < doses; i++) {
+      date = nextDay(date);
+      date = `${nextDay(date)}-${time}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'E3D':
+    for (let i = 1; i < doses; i++) {
+      date = nextDay(date);
+      date = nextDay(date);
+      date = `${nextDay(date)}-${time}`;
+      result.push(date);
+    }
+    return result;
+
+  case 'E4D':
+    for (let i = 1; i < doses; i++) {
+      date = nextDay(date);
+      date = nextDay(date);
+      date = nextDay(date);
+      date = `${nextDay(date)}-${time}`;
+      result.push(date);
+    }
+    return result;
+
+  }
+}
+
+function nextDay(date) {
+  let [, year, month, day] = date.match(regexes.datematch);
+  const monthLength = {
+    '01':31,
+    '02':(year % 400 === 0) ? 29 : ((year % 100 === 0) ? 28 : ((year % 4 === 0) ? 29 : 28)),
+    '03':31,
+    '04':30,
+    '05':31,
+    '06':30,
+    '07':31,
+    '08':31,
+    '09':30,
+    '10':31,
+    '11':30,
+    '12':31,
+  };
+  if (month == 12 && day == 31) {
+    year = (Number(year) + 1);
+    return `${year}-01-01`;
+  } else if (day == monthLength[month]) {
+    month = (Number(month) + 1).toString();
+    if (month.length == 1) {month = '0' + month;}
+    return `${year}-${month}-01`;
+  } else {
+    day = (Number(day) + 1).toString();
+    if (day.length == 1) {day = '0' + day;}
+    return `${year}-${month}-${day}`;
+  }
 }
