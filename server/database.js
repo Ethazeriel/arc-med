@@ -37,6 +37,17 @@ async function get(query, collection) { // arc v1
 }
 // get track by youtubeID: await getTrack({'youtube.id': 'mdh6upXZL6c'});
 
+async function getAll(query, collection) {
+  try {
+    const tracks = db.collection(collection);
+    const cursor = await tracks.find(query, { sort: { id: 1 }, projection: { _id: 0 } });
+    const results = cursor.toArray();
+    return results;
+  } catch (error) {
+    logLine('error', ['database error:', error.stack]);
+  }
+}
+
 
 async function insert(thing, query, collection) { // arc v1
   // inserts a single thing into the database
@@ -135,3 +146,4 @@ exports.remove = remove;
 exports.update = update;
 exports.list = list;
 exports.insertPatient = insertPatient;
+exports.getAll = getAll;

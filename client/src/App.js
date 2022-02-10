@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import IntakeForm from './IntakeForm';
+import MedBoard from './MedBoard';
 
 class SpeciesSearch extends React.Component {
   constructor(props) {
@@ -51,7 +52,9 @@ class SpeciesSearch extends React.Component {
             <p><b>Code:</b> {critter?.id}<br />
               <b>Name:</b> {critter?.name}<br />
               <b>Scientific name:</b> {critter?.sciname}<br />
-              <b>Type:</b> {critter?.category?.detail}</p></div>
+              <b>Type:</b> {critter?.category?.detail}<br />
+              <b>Band size:</b> {critter?.bandsize}<br />
+              <b>Listing:</b> {critter?.bclist}</p></div>
         </header>
       </div>
     );
@@ -100,6 +103,9 @@ class App extends React.Component {
 
     case 'SpeciesSearch':
       return (<SpeciesSearch />);
+
+    case 'MedBoard':
+      return (<MedBoard arc={this.state.arc} />);
 
     default:
       return null;

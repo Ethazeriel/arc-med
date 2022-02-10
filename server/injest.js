@@ -13,7 +13,7 @@ async function injest(newpatient) {
   const id = newpatient?.id?.replace(regexes.sanitize, '').trim();
   if (!regexes.id.test(id)) {return { status:'error', error:'Invalid id' };}
   const idmatch = id.match(/^([\d]{4})([a-z]?)$/);
-  safepatient.id = Number(idmatch[1]);
+  safepatient.id = idmatch[1];
   if (idmatch[2]) {safepatient.family = idmatch[2];}
 
   const preexisting = null;// await db.get({ $and: [{ year: newpatient.year }, { id: newpatient.id }] }, 'patients');

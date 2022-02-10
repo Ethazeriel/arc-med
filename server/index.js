@@ -48,6 +48,18 @@ app.post('/intake', async (req, res) => {
   res.json(response);
 });
 
+app.post('/board', async (req, res) => {
+  logLine('post', [`Endpoint ${chalk.blue('/board')}, code ${chalk.green(`${req.body.date}`)}`]);
+  const date = req.body.date;
+  const response1 = await db.getAll({ 'drugs.when':date }, 'patients');
+  const response2 = await db.getAll({ $and:[{ 'drugs.when':{ $ne:date } }, { 'drugs.done':false }] }, 'patients');
+  const response = {
+    now:response1,
+    cont:response2,
+  };
+  res.json(response);
+});
+
 app.listen(port, () => {
   logLine('info', [`Backend listening at http://localhost:${port}, Node version: ${process.version}`]);
   logDebug(chalk.red.bold('DEBUG MODE ACTIVE'));
