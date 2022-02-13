@@ -156,7 +156,7 @@ class IntakeForm extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     console.log(this.state);
-    fetch('/intake', {
+    fetch('./intake', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -636,7 +636,7 @@ class MedForm extends React.Component {
     switch (event.target.name) {
     case 'arcname':
       if (this.props.arc.drugs.includes(event.target.value)) {
-        fetch('/drugs', {
+        fetch('./drugs', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
