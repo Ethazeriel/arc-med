@@ -27,7 +27,7 @@ class MedBoard extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     console.log(this.state);
-    fetch('./board', {
+    fetch('/board', {
       method: 'POST',
       headers: {
         Accept: 'application/json',

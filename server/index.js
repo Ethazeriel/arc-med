@@ -21,8 +21,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
 
-app.get('/arc', async (req, res) => {
-  logLine('get', [`Endpoint ${chalk.blue('/arc')}`]);
+app.get('/info', async (req, res) => {
+  logLine('get', [`Endpoint ${chalk.blue('/info')}`]);
   arc.drugs = await db.list('arcname', 'drugs');
   res.json(arc);
 });

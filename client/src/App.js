@@ -19,7 +19,7 @@ class SpeciesSearch extends React.Component {
     event.preventDefault();
     this.setState({ value: '' });
     console.log(this.state.value);
-    fetch('./species', {
+    fetch('/species', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -72,7 +72,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch('./arc', {
+    fetch('/info', {
       method: 'GET',
       headers: {
         Accept: 'application/json',
