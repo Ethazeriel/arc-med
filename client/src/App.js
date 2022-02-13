@@ -19,7 +19,7 @@ class SpeciesSearch extends React.Component {
     event.preventDefault();
     this.setState({ value: '' });
     console.log(this.state.value);
-    fetch('/species', {
+    fetch('./species', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -67,12 +67,12 @@ class App extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.sectionChoice = this.sectionChoice.bind(this);
     this.state = {
-      sectionSelect:'IntakeForm',
+      sectionSelect:'MedBoard',
     };
   }
 
   componentDidMount() {
-    fetch('/arc', {
+    fetch('./arc', {
       method: 'GET',
       headers: {
         Accept: 'application/json',

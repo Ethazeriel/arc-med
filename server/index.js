@@ -11,6 +11,7 @@ const app = express();
 const port = 3001;
 
 app.use(helmet());
+app.use('/arc', express.static(path.resolve(__dirname, '../client/build')));
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 app.use(express.json());
 
