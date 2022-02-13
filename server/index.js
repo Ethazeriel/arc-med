@@ -8,7 +8,7 @@ const { injest } = require('./injest.js');
 const chalk = require('chalk');
 const arc = require('./arc.json');
 const app = express();
-const port = 3001;
+const port = 4001;
 
 app.use(helmet());
 app.use('/arc', express.static(path.resolve(__dirname, '../client/build')));
